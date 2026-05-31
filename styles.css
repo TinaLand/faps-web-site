@@ -170,6 +170,14 @@ h3 {
   font-weight: 600;
 }
 
+.positioning-line {
+  max-width: 920px;
+  margin: 18px auto 0;
+  color: var(--navy);
+  font-size: clamp(0.9rem, 1.6vw, 1.12rem);
+  font-weight: 900;
+}
+
 .paper-links,
 .resource-links {
   display: flex;
@@ -235,11 +243,13 @@ h3 {
 .wide-figure,
 .key-figure-layout,
 .evidence-ribbon,
+.positioning-grid,
 .pipeline,
 .detail-grid,
 .figure-pair,
 .operation-flow,
 .phase-grid,
+.insight-grid,
 .table-wrap,
 .ops-grid,
 .ops-notes,
@@ -294,11 +304,13 @@ h3 {
 .question-box,
 .note-panel,
 .callout,
+.positioning-grid article,
 .pipeline article,
 .detail-grid article,
 .phase-grid article,
 .ops-grid article,
 .ops-notes > div,
+.insight-grid article,
 .next-grid article,
 .figure-card,
 .table-wrap {
@@ -311,10 +323,12 @@ h3 {
 .question-box,
 .note-panel,
 .callout,
+.positioning-grid article,
 .pipeline article,
 .detail-grid article,
 .phase-grid article,
 .ops-notes > div,
+.insight-grid article,
 .next-grid article {
   padding: 22px;
 }
@@ -405,15 +419,18 @@ figcaption {
   font-size: 0.92rem;
 }
 
+.positioning-grid,
 .pipeline,
 .detail-grid,
 .phase-grid,
+.insight-grid,
 .ops-grid,
 .next-grid {
   display: grid;
   gap: 18px;
 }
 
+.positioning-grid,
 .pipeline {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 26px;
@@ -422,6 +439,10 @@ figcaption {
 .detail-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 18px;
+}
+
+.insight-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .step-number,
@@ -435,19 +456,23 @@ figcaption {
 }
 
 .pipeline h3,
+.positioning-grid h3,
 .detail-grid h3,
 .phase-grid h3,
 .ops-grid h3,
 .ops-notes h3,
+.insight-grid h3,
 .next-grid h3 {
   margin-top: 10px;
 }
 
 .pipeline p,
+.positioning-grid p,
 .detail-grid p,
 .phase-grid p,
 .ops-grid p,
 .ops-notes p,
+.insight-grid p,
 .next-grid p {
   margin-top: 12px;
   color: var(--muted-ink);
@@ -508,6 +533,10 @@ figcaption {
   margin-top: 26px;
   overflow-x: auto;
   padding: 20px;
+}
+
+.compact-table table {
+  min-width: 680px;
 }
 
 .table-wrap h3 {
@@ -651,16 +680,18 @@ code {
     padding-bottom: 2px;
   }
 
-  .two-col,
-  .abstract-layout,
-  .key-figure-layout,
-  .evidence-ribbon,
-  .pipeline,
-  .detail-grid,
-  .figure-pair,
-  .operation-flow,
-  .phase-grid,
-  .ops-grid,
+    .two-col,
+    .abstract-layout,
+    .key-figure-layout,
+    .evidence-ribbon,
+    .positioning-grid,
+    .pipeline,
+    .detail-grid,
+    .figure-pair,
+    .operation-flow,
+    .phase-grid,
+    .insight-grid,
+    .ops-grid,
   .ops-notes,
   .figure-grid,
   .next-grid {

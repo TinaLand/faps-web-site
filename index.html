@@ -19,6 +19,7 @@
       <nav class="nav-links" aria-label="Primary navigation">
         <a href="#abstract">Abstract</a>
         <a href="#question">Question</a>
+        <a href="#positioning">Positioning</a>
         <a href="#key-figures">Key Figures</a>
         <a href="#method">Method</a>
         <a href="#data">Data</a>
@@ -37,6 +38,9 @@
           <p class="hero-subtitle">
             Inference-time failure detection and activation-space correction for
             vision-language-action robot policies.
+          </p>
+          <p class="positioning-line">
+            Triggered · learned · activation-space · safety-metriced · no VLA weight updates
           </p>
           <div class="paper-links" aria-label="Project links">
             <a href="poster.pdf">Poster</a>
@@ -62,26 +66,26 @@
             <p class="eyebrow">Abstract</p>
             <p>
               We study whether a frozen vision-language-action policy can be
-              made safer without fine-tuning its weights. FAPS wraps SmolVLA
-              with a learned risk head, a hysteresis trigger, and a flow-matching
-              residual model. The risk head reads intermediate action-expert
-              activations and predicts near-term failure; the residual model
-              generates a low-rank correction that is injected back into a
-              selected hidden layer. Across LIBERO perturbation rollouts, risk
-              is strongly detectable from activations, Run C provides the best
-              downstream representation geometry, and C12/C13 flow runs learn
-              substantial nonzero residuals. Current closed-loop diagnostics
-              show that false-positive triggering, rather than residual learning,
-              is the main bottleneck before final shield evaluation.
+              made safer without fine-tuning its weights. FAPS is a triggered,
+              learned, safety-metriced activation-space shield: it fires only
+              when calibrated risk crosses a threshold, injects a flow-model
+              correction conditioned on failure context, and falls back to the
+              unmodified policy when inactive. Across LIBERO perturbation
+              rollouts, risk is strongly detectable from activations, Run C
+              provides the best downstream representation geometry, and C12/C13
+              flow runs learn substantial nonzero residuals. Current closed-loop
+              diagnostics show that false-positive triggering, rather than
+              residual learning, is the main bottleneck before final shield
+              evaluation.
             </p>
           </article>
           <aside class="contribution-card">
             <p class="eyebrow">Contributions</p>
             <ul class="clean-list">
-              <li>Step-level failure detector over frozen SmolVLA activations.</li>
-              <li>Joint risk, TTF, and contrastive embedding for correction.</li>
-              <li>PCA-constrained flow residuals for hidden-state intervention.</li>
-              <li>Closed-loop diagnostic showing trigger precision is critical.</li>
+              <li>Triggered risk gate over frozen SmolVLA activations.</li>
+              <li>Joint BCE, TTF, and NT-Xent training for risk and geometry.</li>
+              <li>Learned PCA-constrained flow residual conditioned on z_t.</li>
+              <li>Safety metrics beyond success rate: false alarms, trigger precision, recovery.</li>
             </ul>
           </aside>
         </div>
@@ -108,6 +112,45 @@
               <li>Improve closed-loop LIBERO success rate under perturbations.</li>
             </ul>
           </div>
+        </div>
+      </section>
+
+      <section class="section" id="positioning">
+        <div class="section-heading">
+          <p class="eyebrow">Positioning Against Prior Work</p>
+          <h2>FAPS is not just another always-on steering method.</h2>
+          <p>
+            The poster's strongest framing is that FAPS combines three pieces
+            that are usually studied separately: failure detection, activation
+            steering, and safety-aware closed-loop evaluation.
+          </p>
+        </div>
+
+        <div class="positioning-grid">
+          <article>
+            <h3>Activation steering</h3>
+            <p>
+              RepE, ITI, ROME, and MEMIT show that hidden states can be edited
+              in large language models. FAPS brings the idea to continuous-action
+              robot policies, where an edit must still produce a valid 7-D action.
+            </p>
+          </article>
+          <article>
+            <h3>VLA robustness</h3>
+            <p>
+              VLA-OS, Don't Blind the VLA, LAE, Cerebellar, and ReSteer study
+              layer analysis, action-space correction, and steerability. FAPS
+              adds a calibrated trigger so the correction is not always on.
+            </p>
+          </article>
+          <article>
+            <h3>COAST</h3>
+            <p>
+              COAST uses always-on closed-form conceptor steering. FAPS instead
+              asks when to intervene, learns a flow residual, and evaluates
+              safety behavior under adversarial and windowed perturbations.
+            </p>
+          </article>
         </div>
       </section>
 
@@ -188,26 +231,27 @@
             <span class="step-number">01</span>
             <h3>Risk head</h3>
             <p>
-              Cross-layer fusion and a temporal transformer convert SmolVLA
-              features into a risk probability, time-to-failure prediction, and
-              embedding z_t.
+              A 3.76M-parameter SharedEncoder uses temporal CNN features,
+              cross-layer attention over six SmolVLA layers, and temporal
+              context to output risk, TTF, and z_t in R^256.
             </p>
           </article>
           <article>
             <span class="step-number">02</span>
             <h3>Hysteresis gate</h3>
             <p>
-              The shield turns on only after risk exceeds delta_high and turns
-              off after K low-risk steps below delta_low. This avoids trigger
-              chatter.
+              The shield enters when risk reaches 0.7 and exits after K=5
+              steps below 0.4 in the current diagnostic setting. Threshold
+              sweep chooses the final operating point.
             </p>
           </article>
           <article>
             <span class="step-number">03</span>
             <h3>Flow residual</h3>
             <p>
-              Flow matching predicts a correction in 48-D PCA space. The
-              correction is injected into a chosen action-expert transformer layer.
+              Flow matching predicts z in R^48, projects it through the top-48
+              PCA basis U_k, and injects Delta = U_k z into a chosen
+              action-expert transformer layer.
             </p>
           </article>
         </div>
@@ -226,7 +270,8 @@
             <p>
               Direct 480-D edits are high variance and can leave the model's
               training manifold. PCA keeps corrections low-rank and aligned with
-              common SmolVLA activation directions.
+              common SmolVLA activation directions; the compact 48-D basis keeps
+              about 95% of the relevant variance in the poster analysis.
             </p>
           </article>
           <article>
@@ -245,10 +290,11 @@
           <p class="eyebrow">Data And Labels</p>
           <h2>We turn rollouts into step-level failure supervision.</h2>
           <p>
-            The project uses LIBERO rollouts with nominal behavior, continuous
-            perturbations, and windowed perturbations. The windowed setting is
-            important because the policy gets a chance to recover after the
-            perturbation turns off.
+            The project uses 5,117 labeled LIBERO rollouts across 11
+            perturbation types, with nominal behavior, continuous perturbations,
+            and windowed perturbations. Each trajectory is converted into
+            step-level fail_in_H labels with horizon H=30 plus time-to-failure
+            and coarse failure-type metadata.
           </p>
         </div>
 
@@ -261,6 +307,41 @@
             <img src="assets/ttf_distribution.png" alt="Time-to-failure distribution.">
             <figcaption><strong>TTF labels.</strong> Time-to-failure provides a temporal target beyond binary risk.</figcaption>
           </figure>
+        </div>
+
+        <div class="table-wrap compact-table">
+          <h3>Immediate Retrain Data Split</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Subset</th>
+                <th>Count</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Windowed perturbations</td>
+                <td>999</td>
+                <td>Positive and hard local-risk examples.</td>
+              </tr>
+              <tr>
+                <td>Nominal successes</td>
+                <td>250</td>
+                <td>Clean negatives for trigger precision.</td>
+              </tr>
+              <tr>
+                <td>Nominal timeout failures</td>
+                <td>125</td>
+                <td>Excluded as likely timeout artifacts.</td>
+              </tr>
+              <tr>
+                <td>Continuous perturbations</td>
+                <td>4,118</td>
+                <td>Held out from retrain; later stress/eval set.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <div class="operation-flow">
@@ -644,6 +725,41 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
         </div>
       </section>
 
+      <section class="section" id="insights">
+        <div class="section-heading">
+          <p class="eyebrow">Poster Takeaways</p>
+          <h2>The main scientific story in three claims.</h2>
+          <p>
+            These are the parts worth borrowing from the poster because they
+            make the project feel like a research argument instead of only a run log.
+          </p>
+        </div>
+
+        <div class="insight-grid">
+          <article>
+            <h3>Risk is accessible in VLA activations.</h3>
+            <p>
+              BCE+TTF reaches wAUC 0.927, so the frozen policy's hidden states
+              already contain enough signal to rank near-term failure.
+            </p>
+          </article>
+          <article>
+            <h3>Contrastive geometry is a design choice.</h3>
+            <p>
+              Run C gives up only about 0.010 wAUC relative to B, but improves
+              silhouette from -0.040 to +0.168, making z_t more useful for flow.
+            </p>
+          </article>
+          <article>
+            <h3>The online bottleneck is calibration.</h3>
+            <p>
+              Flow residuals are nonzero and stable; the main failure mode is
+              triggering too often on safe or nominal states.
+            </p>
+          </article>
+        </div>
+      </section>
+
       <section class="section muted" id="next">
         <div class="section-heading">
           <p class="eyebrow">What We Would Do Next</p>
@@ -669,6 +785,20 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
             <p>
               Report unshielded vs FAPS success rate, trigger precision, false
               alarm, and recovery success across perturbation types.
+            </p>
+          </article>
+          <article>
+            <h3>4. Compare intervention subspaces</h3>
+            <p>
+              Test U_k versus action-sensitive U_potent and null-space U_null,
+              then compare first-step, last-step, and always-on injection timing.
+            </p>
+          </article>
+          <article>
+            <h3>5. State limitations clearly</h3>
+            <p>
+              Current evidence is simulation-only, uses one SmolVLA policy, and
+              still needs final C12/C13 shield evaluation after trigger retrain.
             </p>
           </article>
         </div>
