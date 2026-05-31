@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FAPS | Failure-Aware Policy Shielding</title>
+    <meta
+      name="description"
+      content="FAPS is a CS224R project on inference-time failure detection and activation-space correction for frozen vision-language-action policies."
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="FAPS home">
+        <span class="brand-mark">F</span>
+        <span>FAPS</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#method">Method</a>
+        <a href="#results">Results</a>
+        <a href="#figures">Figures</a>
+        <a href="#phase3">Phase 3</a>
+        <a href="#next">Next</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <p class="eyebrow">Stanford CS224R · Spring 2026</p>
+          <h1 id="hero-title">FAPS</h1>
+          <p class="hero-subtitle">Failure-Aware Policy Shielding for Frozen Vision-Language-Action Policies</p>
+          <p class="hero-copy">
+            FAPS detects when SmolVLA is entering a risky state and injects a low-rank
+            activation residual into the action expert, aiming to recover without
+            fine-tuning the base policy.
+          </p>
+          <div class="hero-actions" aria-label="Project links">
+            <a class="button primary" href="#results">View Results</a>
+            <a class="button secondary" href="poster.pdf">Poster PDF</a>
+            <a class="button secondary" href="EXPERIMENT_SUMMARY.md">Experiment Summary</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section intro-section">
+        <div class="section-grid two-col">
+          <div>
+            <p class="eyebrow">Project Summary</p>
+            <h2>A safety layer that acts inside the policy, not after it.</h2>
+            <p>
+              Most robot policy shields intervene after an action is already produced.
+              FAPS instead reads intermediate SmolVLA activations, predicts near-term
+              failure risk, and edits a hidden state before downstream transformer
+              layers finish producing the action.
+            </p>
+          </div>
+          <div class="takeaway-list">
+            <div class="takeaway">
+              <span class="takeaway-label">Phase 1</span>
+              <strong>Risk is detectable.</strong>
+              <p>BCE-based risk heads reach about 0.927 weighted AUC on windowed perturbation episodes.</p>
+            </div>
+            <div class="takeaway">
+              <span class="takeaway-label">Phase 2</span>
+              <strong>Residuals are learnable.</strong>
+              <p>C12/C13 flow runs produce substantial nonzero corrections in the PCA activation space.</p>
+            </div>
+            <div class="takeaway">
+              <span class="takeaway-label">Phase 3</span>
+              <strong>The bottleneck is triggering.</strong>
+              <p>The current diagnostic shows false-positive injections are the main issue before final shield eval.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section muted" id="method">
+        <div class="section-heading">
+          <p class="eyebrow">Method</p>
+          <h2>Detect, gate, and correct at inference time.</h2>
+          <p>
+            The base SmolVLA policy stays frozen. FAPS adds a detector, a hysteresis
+            trigger, and a flow-matching residual model that edits one action-expert layer.
+          </p>
+        </div>
+
+        <figure class="wide-figure">
+          <img src="assets/architecture.png" alt="FAPS architecture diagram showing risk detection and activation injection.">
+          <figcaption>
+            FAPS reads six action-expert layers, predicts risk, then injects a PCA-constrained residual into a selected layer.
+          </figcaption>
+        </figure>
+
+        <div class="pipeline">
+          <article>
+            <span class="step-number">01</span>
+            <h3>Encode risk</h3>
+            <p>
+              A 3.76M-parameter risk head reads SmolVLA activations, actions, proprioception,
+              and short temporal context to produce a risk score and embedding z_t.
+            </p>
+          </article>
+          <article>
+            <span class="step-number">02</span>
+            <h3>Trigger carefully</h3>
+            <p>
+              A hysteresis state machine enters shielding only after high risk persists,
+              then exits after risk stays low for K steps.
+            </p>
+          </article>
+          <article>
+            <span class="step-number">03</span>
+            <h3>Inject a residual</h3>
+            <p>
+              Flow matching predicts a low-dimensional correction. A PCA basis maps it
+              back into the hidden activation space of the selected layer.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="results">
+        <div class="section-heading">
+          <p class="eyebrow">Results</p>
+          <h2>Current evidence by phase.</h2>
+          <p>
+            These are the results currently safe to present. Phase 3 remains diagnostic
+            until the retrained nominal-aware trigger is evaluated.
+          </p>
+        </div>
+
+        <div class="metric-strip" aria-label="Headline metrics">
+          <div class="metric">
+            <span>wAUC</span>
+            <strong>0.927</strong>
+            <p>Run B pure detector baseline</p>
+          </div>
+          <div class="metric">
+            <span>Silhouette</span>
+            <strong>+0.168</strong>
+            <p>Run C representation geometry</p>
+          </div>
+          <div class="metric">
+            <span>Delta norm</span>
+            <strong>1.52-1.55</strong>
+            <p>C12/C13 flow candidates</p>
+          </div>
+          <div class="metric">
+            <span>FPR issue</span>
+            <strong>0.78-0.94</strong>
+            <p>Pre-retrain shield diagnostic</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <h3>Phase 1: Risk Head Ablation</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Run</th>
+                <th>Training signal</th>
+                <th>wAUC</th>
+                <th>AP</th>
+                <th>TTF r</th>
+                <th>Silhouette</th>
+                <th>Use</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>A</td>
+                <td>BCE only</td>
+                <td>0.928</td>
+                <td>0.448</td>
+                <td>0.380</td>
+                <td>-0.046</td>
+                <td>Detector baseline</td>
+              </tr>
+              <tr>
+                <td>B</td>
+                <td>BCE + TTF</td>
+                <td>0.927</td>
+                <td>0.444</td>
+                <td>0.368</td>
+                <td>-0.040</td>
+                <td>Strong pure detector</td>
+              </tr>
+              <tr class="selected-row">
+                <td>C</td>
+                <td>BCE + TTF + NT-Xent</td>
+                <td>0.917</td>
+                <td>0.461</td>
+                <td>0.413</td>
+                <td>+0.168</td>
+                <td>Selected encoder</td>
+              </tr>
+              <tr>
+                <td>D</td>
+                <td>NT-Xent only</td>
+                <td>0.440</td>
+                <td>0.086</td>
+                <td>0.075</td>
+                <td>+0.125</td>
+                <td>Negative control</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="table-wrap">
+          <h3>Phase 2: Flow-Matching Residual Runs</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Run</th>
+                <th>Layer</th>
+                <th>Loss</th>
+                <th>Delta norm</th>
+                <th>Sample norm</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>flow_c4_l12</td>
+                <td>12</td>
+                <td>0.300</td>
+                <td>1.520</td>
+                <td>1.108</td>
+                <td>C12 injection candidate</td>
+              </tr>
+              <tr>
+                <td>flow_c5_l13</td>
+                <td>13</td>
+                <td>0.303</td>
+                <td>1.553</td>
+                <td>1.343</td>
+                <td>C13 injection candidate</td>
+              </tr>
+              <tr class="selected-row">
+                <td>flow_b5_failure_conceptor_60k</td>
+                <td>11</td>
+                <td>0.312</td>
+                <td>2.000</td>
+                <td>2.316</td>
+                <td>Strong residual diagnostic</td>
+              </tr>
+              <tr>
+                <td>flow_d_gaussian_l11</td>
+                <td>11</td>
+                <td>0.051</td>
+                <td>0.024</td>
+                <td>0.216</td>
+                <td>Gaussian control</td>
+              </tr>
+              <tr>
+                <td>flow_z_ownenc_l11</td>
+                <td>11</td>
+                <td>0.035</td>
+                <td>0.082</td>
+                <td>0.144</td>
+                <td>Own-encoder control</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section muted" id="figures">
+        <div class="section-heading">
+          <p class="eyebrow">Visual Evidence</p>
+          <h2>How to read the main figures.</h2>
+          <p>
+            The website separates detector quality, representation geometry, calibration,
+            and flow behavior so the claims do not blur together.
+          </p>
+        </div>
+
+        <div class="figure-grid">
+          <figure class="figure-card">
+            <img src="assets/umap_run_b.png" alt="Run B UMAP of risk embeddings.">
+            <figcaption><strong>Run B UMAP.</strong> Strong risk detector, weaker failure-type clustering.</figcaption>
+          </figure>
+          <figure class="figure-card">
+            <img src="assets/umap_run_c.png" alt="Run C UMAP of risk embeddings.">
+            <figcaption><strong>Run C UMAP.</strong> Better embedding geometry for downstream flow conditioning.</figcaption>
+          </figure>
+          <figure class="figure-card">
+            <img src="assets/reliability_run_c.png" alt="Run C reliability diagram.">
+            <figcaption><strong>Calibration.</strong> Reliability curves show whether risk scores behave like probabilities.</figcaption>
+          </figure>
+          <figure class="figure-card">
+            <img src="assets/threshold_run_c.png" alt="Run C threshold sweep plot.">
+            <figcaption><strong>Threshold sweep.</strong> Chooses a trigger setting that balances early detection and false alarms.</figcaption>
+          </figure>
+          <figure class="figure-card">
+            <img src="assets/flow_c12_metrics.png" alt="Flow C12 training metrics.">
+            <figcaption><strong>Flow metrics.</strong> Stable loss and nonzero residual norms show the model learns a correction field.</figcaption>
+          </figure>
+          <figure class="figure-card">
+            <img src="assets/flow_b5_residual_umap.png" alt="Flow B5 residual UMAP.">
+            <figcaption><strong>Residual UMAP.</strong> B5 residuals are visually structured, but closed-loop eval is still required.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section" id="phase3">
+        <div class="section-grid two-col">
+          <div>
+            <p class="eyebrow">Phase 3 Status</p>
+            <h2>Closed-loop recovery is the final test.</h2>
+            <p>
+              The current online shield result is a diagnostic, not the final claim.
+              It shows that false-positive triggering can hurt recovery, especially
+              when the detector fires on otherwise safe steps.
+            </p>
+            <p>
+              The next evaluation uses a nominal-aware retrained risk head, then tests
+              B5/C12/C13 candidates with the same threshold settings.
+            </p>
+          </div>
+          <div class="callout">
+            <h3>Main lesson so far</h3>
+            <p>
+              When the shield avoids false-positive injections, perturbed shielded
+              episodes look promising. When it triggers at the wrong time, it can
+              over-correct and lower success.
+            </p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <h3>Pre-Retrain Diagnostic</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Perturbation</th>
+                <th>Unshielded SR</th>
+                <th>FAPS SR</th>
+                <th>Delta SR</th>
+                <th>Precision</th>
+                <th>FPR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>none</td>
+                <td>0.60</td>
+                <td>0.60</td>
+                <td>0.00</td>
+                <td>--</td>
+                <td>--</td>
+              </tr>
+              <tr>
+                <td>action_noise_windowed</td>
+                <td>0.70</td>
+                <td>0.80</td>
+                <td>+0.10</td>
+                <td>0.183</td>
+                <td>0.896</td>
+              </tr>
+              <tr>
+                <td>image_blur_windowed</td>
+                <td>0.80</td>
+                <td>0.80</td>
+                <td>0.00</td>
+                <td>0.165</td>
+                <td>0.936</td>
+              </tr>
+              <tr>
+                <td>joint_noise_windowed</td>
+                <td>0.80</td>
+                <td>0.70</td>
+                <td>-0.10</td>
+                <td>0.104</td>
+                <td>0.782</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section muted" id="next">
+        <div class="section-heading">
+          <p class="eyebrow">Next Steps</p>
+          <h2>What remains before a strong paper claim.</h2>
+        </div>
+        <div class="next-grid">
+          <article>
+            <h3>Retrain the trigger</h3>
+            <p>Train the risk head with nominal-success episodes as clean negatives, then rerun calibration and threshold sweep.</p>
+          </article>
+          <article>
+            <h3>Run Phase 3 ladder</h3>
+            <p>Start with B5 layer-11 smoke, then threshold smoke, then compare B5, C12, and C13 under the same settings.</p>
+          </article>
+          <article>
+            <h3>Report closed-loop success</h3>
+            <p>The final headline should be success improvement, recovery rate among triggered episodes, and nominal false-alarm control.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section resource-section">
+        <div class="section-heading">
+          <p class="eyebrow">Resources</p>
+          <h2>Project artifacts.</h2>
+        </div>
+        <div class="resource-links">
+          <a href="poster.pdf">Poster PDF</a>
+          <a href="FAPS_supplementary.pdf">Supplementary PDF</a>
+          <a href="EXPERIMENT_SUMMARY.md">Experiment Summary</a>
+          <a href="COMMANDS_BY_PHASE.md">Commands by Phase</a>
+          <a href="https://github.com/equalsdaniel/CS224R_robotics_project">GitHub Repository</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>FAPS: Failure-Aware Policy Shielding · Stanford CS224R · Spring 2026</p>
+      <p>Static project page prepared from the current public release assets.</p>
+    </footer>
+  </body>
+</html>
