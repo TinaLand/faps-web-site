@@ -6,7 +6,7 @@
     <title>FAPS | Failure-Aware Policy Shielding</title>
     <meta
       name="description"
-      content="FAPS is a CS224R project on inference-time failure detection and activation-space correction for frozen vision-language-action policies."
+      content="FAPS is a CS224R project on inference-time failure detection, flow-matching correction, and activation-space shielding for frozen VLA policies."
     >
     <link rel="stylesheet" href="styles.css">
   </head>
@@ -17,146 +17,257 @@
         <span>FAPS</span>
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#question">Question</a>
         <a href="#method">Method</a>
+        <a href="#data">Data</a>
+        <a href="#experiments">Experiments</a>
+        <a href="#operations">Operations</a>
         <a href="#results">Results</a>
-        <a href="#figures">Figures</a>
-        <a href="#phase3">Phase 3</a>
         <a href="#next">Next</a>
       </nav>
     </header>
 
     <main id="top">
       <section class="hero" aria-labelledby="hero-title">
-        <div class="hero-overlay"></div>
         <div class="hero-content">
           <p class="eyebrow">Stanford CS224R · Spring 2026</p>
-          <h1 id="hero-title">FAPS</h1>
-          <p class="hero-subtitle">Failure-Aware Policy Shielding for Frozen Vision-Language-Action Policies</p>
+          <h1 id="hero-title">Failure-Aware Policy Shielding</h1>
+          <p class="hero-subtitle">
+            Detecting and correcting risky internal states in frozen
+            vision-language-action policies.
+          </p>
           <p class="hero-copy">
-            FAPS detects when SmolVLA is entering a risky state and injects a low-rank
-            activation residual into the action expert, aiming to recover without
-            fine-tuning the base policy.
+            FAPS adds an inference-time safety layer around SmolVLA. It reads
+            intermediate transformer activations, predicts near-term failure,
+            and injects a low-rank residual into the action expert before the
+            final action is produced.
           </p>
           <div class="hero-actions" aria-label="Project links">
-            <a class="button primary" href="#results">View Results</a>
+            <a class="button primary" href="#experiments">Experiment Design</a>
             <a class="button secondary" href="poster.pdf">Poster PDF</a>
-            <a class="button secondary" href="EXPERIMENT_SUMMARY.md">Experiment Summary</a>
+            <a class="button secondary" href="EXPERIMENT_SUMMARY.md">Run Summary</a>
           </div>
         </div>
+        <aside class="hero-panel" aria-label="Current project status">
+          <div>
+            <span class="panel-label">Base policy</span>
+            <strong>SmolVLA frozen</strong>
+            <p>No policy fine-tuning; all intervention is inference-time.</p>
+          </div>
+          <div>
+            <span class="panel-label">Risk detector</span>
+            <strong>3.76M params</strong>
+            <p>Multi-layer activations + action + proprio + temporal context.</p>
+          </div>
+          <div>
+            <span class="panel-label">Correction space</span>
+            <strong>48-D residual</strong>
+            <p>PCA-constrained injection into one action-expert layer.</p>
+          </div>
+        </aside>
       </section>
 
-      <section class="section intro-section">
+      <section class="section compact" id="question">
         <div class="section-grid two-col">
           <div>
-            <p class="eyebrow">Project Summary</p>
-            <h2>A safety layer that acts inside the policy, not after it.</h2>
+            <p class="eyebrow">Research Question</p>
+            <h2>Can a robot policy be rescued without retraining it?</h2>
             <p>
-              Most robot policy shields intervene after an action is already produced.
-              FAPS instead reads intermediate SmolVLA activations, predicts near-term
-              failure risk, and edits a hidden state before downstream transformer
-              layers finish producing the action.
+              Vision-language-action policies can fail under camera blur, action
+              noise, and joint noise. Instead of fine-tuning the whole model,
+              FAPS asks whether we can detect risky internal states and apply a
+              small activation-level correction during inference.
             </p>
           </div>
-          <div class="takeaway-list">
-            <div class="takeaway">
-              <span class="takeaway-label">Phase 1</span>
-              <strong>Risk is detectable.</strong>
-              <p>BCE-based risk heads reach about 0.927 weighted AUC on windowed perturbation episodes.</p>
-            </div>
-            <div class="takeaway">
-              <span class="takeaway-label">Phase 2</span>
-              <strong>Residuals are learnable.</strong>
-              <p>C12/C13 flow runs produce substantial nonzero corrections in the PCA activation space.</p>
-            </div>
-            <div class="takeaway">
-              <span class="takeaway-label">Phase 3</span>
-              <strong>The bottleneck is triggering.</strong>
-              <p>The current diagnostic shows false-positive injections are the main issue before final shield eval.</p>
-            </div>
+          <div class="question-box">
+            <h3>What counts as success?</h3>
+            <ul class="clean-list">
+              <li>Detect risky steps before task failure.</li>
+              <li>Avoid false alarms on nominal episodes.</li>
+              <li>Produce nonzero residuals that stay on the activation manifold.</li>
+              <li>Improve closed-loop LIBERO success rate under perturbations.</li>
+            </ul>
           </div>
         </div>
       </section>
 
       <section class="section muted" id="method">
         <div class="section-heading">
-          <p class="eyebrow">Method</p>
-          <h2>Detect, gate, and correct at inference time.</h2>
+          <p class="eyebrow">System Design</p>
+          <h2>Three modules around a frozen policy.</h2>
           <p>
-            The base SmolVLA policy stays frozen. FAPS adds a detector, a hysteresis
-            trigger, and a flow-matching residual model that edits one action-expert layer.
+            FAPS treats SmolVLA as fixed infrastructure. The learned pieces sit
+            outside the base model and use forward hooks to read and edit hidden
+            states.
           </p>
         </div>
 
         <figure class="wide-figure">
           <img src="assets/architecture.png" alt="FAPS architecture diagram showing risk detection and activation injection.">
           <figcaption>
-            FAPS reads six action-expert layers, predicts risk, then injects a PCA-constrained residual into a selected layer.
+            The risk head reads six SmolVLA action-expert layers. The flow model
+            predicts a low-dimensional residual. The injector maps that residual
+            through a layer-specific PCA basis and adds it to the selected hidden state.
           </figcaption>
         </figure>
 
         <div class="pipeline">
           <article>
             <span class="step-number">01</span>
-            <h3>Encode risk</h3>
+            <h3>Risk head</h3>
             <p>
-              A 3.76M-parameter risk head reads SmolVLA activations, actions, proprioception,
-              and short temporal context to produce a risk score and embedding z_t.
+              Cross-layer fusion and a temporal transformer convert SmolVLA
+              features into a risk probability, time-to-failure prediction, and
+              embedding z_t.
             </p>
           </article>
           <article>
             <span class="step-number">02</span>
-            <h3>Trigger carefully</h3>
+            <h3>Hysteresis gate</h3>
             <p>
-              A hysteresis state machine enters shielding only after high risk persists,
-              then exits after risk stays low for K steps.
+              The shield turns on only after risk exceeds delta_high and turns
+              off after K low-risk steps below delta_low. This avoids trigger
+              chatter.
             </p>
           </article>
           <article>
             <span class="step-number">03</span>
-            <h3>Inject a residual</h3>
+            <h3>Flow residual</h3>
             <p>
-              Flow matching predicts a low-dimensional correction. A PCA basis maps it
-              back into the hidden activation space of the selected layer.
+              Flow matching predicts a correction in 48-D PCA space. The
+              correction is injected into a chosen action-expert transformer layer.
+            </p>
+          </article>
+        </div>
+
+        <div class="detail-grid">
+          <article>
+            <h3>Why internal activations?</h3>
+            <p>
+              Action-space patching happens after the policy has already committed.
+              Hidden-state injection gives downstream layers a chance to revise the
+              plan before the final 7-D robot action is emitted.
+            </p>
+          </article>
+          <article>
+            <h3>Why PCA?</h3>
+            <p>
+              Direct 480-D edits are high variance and can leave the model's
+              training manifold. PCA keeps corrections low-rank and aligned with
+              common SmolVLA activation directions.
+            </p>
+          </article>
+          <article>
+            <h3>Why conceptors?</h3>
+            <p>
+              Conceptors summarize success, recovered, and failure activation
+              subspaces. They provide pseudo-targets for flow residuals when true
+              recovery deltas are not directly supervised.
             </p>
           </article>
         </div>
       </section>
 
-      <section class="section" id="results">
+      <section class="section" id="data">
         <div class="section-heading">
-          <p class="eyebrow">Results</p>
-          <h2>Current evidence by phase.</h2>
+          <p class="eyebrow">Data And Labels</p>
+          <h2>We turn rollouts into step-level failure supervision.</h2>
           <p>
-            These are the results currently safe to present. Phase 3 remains diagnostic
-            until the retrained nominal-aware trigger is evaluated.
+            The project uses LIBERO rollouts with nominal behavior, continuous
+            perturbations, and windowed perturbations. The windowed setting is
+            important because the policy gets a chance to recover after the
+            perturbation turns off.
           </p>
         </div>
 
-        <div class="metric-strip" aria-label="Headline metrics">
-          <div class="metric">
-            <span>wAUC</span>
-            <strong>0.927</strong>
-            <p>Run B pure detector baseline</p>
+        <div class="figure-pair">
+          <figure class="figure-card">
+            <img src="assets/perturbation_summary_table.png" alt="Perturbation summary table.">
+            <figcaption><strong>Perturbation coverage.</strong> Windowed action noise, image blur, and joint noise are the main recovery stress tests.</figcaption>
+          </figure>
+          <figure class="figure-card">
+            <img src="assets/ttf_distribution.png" alt="Time-to-failure distribution.">
+            <figcaption><strong>TTF labels.</strong> Time-to-failure provides a temporal target beyond binary risk.</figcaption>
+          </figure>
+        </div>
+
+        <div class="operation-flow">
+          <div>
+            <span>1</span>
+            <h3>Collect rollouts</h3>
+            <p>Run LIBERO episodes with nominal, continuous, and windowed perturbations.</p>
           </div>
-          <div class="metric">
-            <span>Silhouette</span>
-            <strong>+0.168</strong>
-            <p>Run C representation geometry</p>
+          <div>
+            <span>2</span>
+            <h3>Label trajectories</h3>
+            <p>Create fail_in_H, TTF, success, recovery, and perturbation metadata.</p>
           </div>
-          <div class="metric">
-            <span>Delta norm</span>
-            <strong>1.52-1.55</strong>
-            <p>C12/C13 flow candidates</p>
+          <div>
+            <span>3</span>
+            <h3>Extract features</h3>
+            <p>Save SmolVLA activations from action-expert layers 3 through 14.</p>
           </div>
-          <div class="metric">
-            <span>FPR issue</span>
-            <strong>0.78-0.94</strong>
-            <p>Pre-retrain shield diagnostic</p>
+          <div>
+            <span>4</span>
+            <h3>Build manifest</h3>
+            <p>Combine pilot and windowed episodes into a reproducible training manifest.</p>
           </div>
         </div>
 
+        <div class="note-panel">
+          <h3>Label audit lesson</h3>
+          <p>
+            A strong offline AUC can be misleading if the detector never sees
+            nominal successes as clean negatives. The next risk-head retrain
+            explicitly includes nominal-success episodes to reduce false alarms
+            on perturbation=none.
+          </p>
+        </div>
+      </section>
+
+      <section class="section muted" id="experiments">
+        <div class="section-heading">
+          <p class="eyebrow">Experiment Design</p>
+          <h2>Each phase answers a different question.</h2>
+          <p>
+            We separate detection, correction, and closed-loop behavior so that
+            a good detector score is not confused with a working recovery system.
+          </p>
+        </div>
+
+        <div class="phase-grid">
+          <article>
+            <span class="phase-tag">Phase 1</span>
+            <h3>Risk-head ablation</h3>
+            <p><strong>Question:</strong> Which supervision makes a useful detector and embedding?</p>
+            <p><strong>Runs:</strong> A BCE, B BCE+TTF, C BCE+TTF+NT-Xent, D NT-Xent only.</p>
+            <p><strong>Decision:</strong> Use B as pure detector baseline; use C as downstream encoder.</p>
+          </article>
+          <article>
+            <span class="phase-tag">Phase 1b</span>
+            <h3>Calibration and threshold sweep</h3>
+            <p><strong>Question:</strong> Which trigger threshold fires early without too many false alarms?</p>
+            <p><strong>Outputs:</strong> reliability diagrams, temperature scaling, threshold_sweep.json.</p>
+            <p><strong>Decision:</strong> Use calibrated hysteresis settings for shield eval.</p>
+          </article>
+          <article>
+            <span class="phase-tag">Phase 2</span>
+            <h3>Flow matching</h3>
+            <p><strong>Question:</strong> Can we learn meaningful activation residuals?</p>
+            <p><strong>Runs:</strong> B-family recipe tests, C-layer sweep, D/Z controls.</p>
+            <p><strong>Decision:</strong> C12/C13 and B5 are the main candidates for online eval.</p>
+          </article>
+          <article>
+            <span class="phase-tag">Phase 3</span>
+            <h3>Closed-loop shield eval</h3>
+            <p><strong>Question:</strong> Does FAPS improve LIBERO success rate?</p>
+            <p><strong>Metrics:</strong> success rate, trigger rate, false alarm, recovery success.</p>
+            <p><strong>Status:</strong> current result is diagnostic; final eval follows retrain.</p>
+          </article>
+        </div>
+
         <div class="table-wrap">
-          <h3>Phase 1: Risk Head Ablation</h3>
+          <h3>Risk Head Ablation Matrix</h3>
           <table>
             <thead>
               <tr>
@@ -166,7 +277,7 @@
                 <th>AP</th>
                 <th>TTF r</th>
                 <th>Silhouette</th>
-                <th>Use</th>
+                <th>Interpretation</th>
               </tr>
             </thead>
             <tbody>
@@ -177,7 +288,7 @@
                 <td>0.448</td>
                 <td>0.380</td>
                 <td>-0.046</td>
-                <td>Detector baseline</td>
+                <td>Risk is learnable from activations.</td>
               </tr>
               <tr>
                 <td>B</td>
@@ -186,7 +297,7 @@
                 <td>0.444</td>
                 <td>0.368</td>
                 <td>-0.040</td>
-                <td>Strong pure detector</td>
+                <td>Strong pure detector.</td>
               </tr>
               <tr class="selected-row">
                 <td>C</td>
@@ -195,7 +306,7 @@
                 <td>0.461</td>
                 <td>0.413</td>
                 <td>+0.168</td>
-                <td>Selected encoder</td>
+                <td>Best representation for downstream flow.</td>
               </tr>
               <tr>
                 <td>D</td>
@@ -204,14 +315,14 @@
                 <td>0.086</td>
                 <td>0.075</td>
                 <td>+0.125</td>
-                <td>Negative control</td>
+                <td>Contrastive-only does not detect risk.</td>
               </tr>
             </tbody>
           </table>
         </div>
 
         <div class="table-wrap">
-          <h3>Phase 2: Flow-Matching Residual Runs</h3>
+          <h3>Flow Run Interpretation</h3>
           <table>
             <thead>
               <tr>
@@ -219,90 +330,166 @@
                 <th>Layer</th>
                 <th>Loss</th>
                 <th>Delta norm</th>
-                <th>Sample norm</th>
                 <th>Role</th>
               </tr>
             </thead>
             <tbody>
+              <tr class="selected-row">
+                <td>flow_b5_failure_conceptor_60k</td>
+                <td>11</td>
+                <td>0.312</td>
+                <td>2.000</td>
+                <td>Strongest B-family residual diagnostic.</td>
+              </tr>
               <tr>
                 <td>flow_c4_l12</td>
                 <td>12</td>
                 <td>0.300</td>
                 <td>1.520</td>
-                <td>1.108</td>
-                <td>C12 injection candidate</td>
+                <td>C12 online-eval candidate.</td>
               </tr>
               <tr>
                 <td>flow_c5_l13</td>
                 <td>13</td>
                 <td>0.303</td>
                 <td>1.553</td>
-                <td>1.343</td>
-                <td>C13 injection candidate</td>
-              </tr>
-              <tr class="selected-row">
-                <td>flow_b5_failure_conceptor_60k</td>
-                <td>11</td>
-                <td>0.312</td>
-                <td>2.000</td>
-                <td>2.316</td>
-                <td>Strong residual diagnostic</td>
+                <td>C13 online-eval candidate.</td>
               </tr>
               <tr>
                 <td>flow_d_gaussian_l11</td>
                 <td>11</td>
                 <td>0.051</td>
                 <td>0.024</td>
-                <td>0.216</td>
-                <td>Gaussian control</td>
+                <td>Gaussian augmentation control; tiny residual.</td>
               </tr>
               <tr>
                 <td>flow_z_ownenc_l11</td>
                 <td>11</td>
                 <td>0.035</td>
                 <td>0.082</td>
-                <td>0.144</td>
-                <td>Own-encoder control</td>
+                <td>Own-encoder control; not main method.</td>
               </tr>
             </tbody>
           </table>
         </div>
       </section>
 
-      <section class="section muted" id="figures">
+      <section class="section" id="operations">
+        <div class="section-heading">
+          <p class="eyebrow">Operational Details</p>
+          <h2>How we actually ran the project.</h2>
+          <p>
+            The project became feasible after moving heavy training to Modal,
+            archiving W&B outputs, and copying NPZ data onto local SSD inside
+            jobs to avoid repeated network-volume reads.
+          </p>
+        </div>
+
+        <div class="ops-grid">
+          <article>
+            <h3>FarmShare data DAG</h3>
+            <pre><code>COLLECT_JOB=$(sbatch --parsable docker/collect_windowed.sbatch)
+LABEL_JOB=$(sbatch --parsable --dependency=afterok:$COLLECT_JOB docker/label_windowed.sbatch)
+EXTRACT_JOB=$(sbatch --parsable --dependency=afterok:$LABEL_JOB docker/extract_features_windowed.sbatch)
+MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepare_and_manifest.sbatch)</code></pre>
+          </article>
+          <article>
+            <h3>Modal risk retrain</h3>
+            <pre><code>modal run --detach modal_train_full.py::main \
+  --windowed-only \
+  --include-nominal \
+  --exclude-nominal-failures \
+  --epochs 30 \
+  --batch-size 64 \
+  --w-risk 0.4 --w-ttf 0.2 --w-con 0.4</code></pre>
+          </article>
+          <article>
+            <h3>Modal flow candidate</h3>
+            <pre><code>modal run --detach modal_train_full.py::submit_flow \
+  --run-name flow_b5_failure_conceptor_60k \
+  --aug-layer-idx 3 \
+  --real-conceptor-dir conceptors \
+  --lambda-failure 0.1 \
+  --include-failures \
+  --steps 60000 --batch-size 128</code></pre>
+          </article>
+          <article>
+            <h3>Phase 3 smoke</h3>
+            <pre><code>modal run --detach modal_train_full.py::submit_shield_eval_smoke \
+  --flow-run-name flow_b5_failure_conceptor_60k \
+  --layer 11 \
+  --perturbations none,action_noise_windowed,image_blur_windowed,joint_noise_windowed</code></pre>
+          </article>
+        </div>
+
+        <div class="ops-notes">
+          <div>
+            <h3>Speedups that mattered</h3>
+            <p>
+              Lazy NPZ loading avoided loading every feature file up front.
+              Modal volume to local NVMe copy avoided slow network reads.
+              DataLoader workers, pin_memory, and persistent_workers improved
+              GPU utilization during risk-head training.
+            </p>
+          </div>
+          <div>
+            <h3>What we archive</h3>
+            <p>
+              Each finished run should have the exact command, Modal logs, W&B
+              summary, plots, checkpoint path, and a short interpretation. This
+              makes ablations auditable rather than just a collection of run names.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section muted" id="results">
         <div class="section-heading">
           <p class="eyebrow">Visual Evidence</p>
-          <h2>How to read the main figures.</h2>
+          <h2>Different figures answer different claims.</h2>
           <p>
-            The website separates detector quality, representation geometry, calibration,
-            and flow behavior so the claims do not blur together.
+            The main mistake to avoid is treating every plot as proof of recovery.
+            Detector plots, calibration plots, flow plots, and closed-loop results
+            support different pieces of the story.
           </p>
         </div>
 
         <div class="figure-grid">
           <figure class="figure-card">
             <img src="assets/umap_run_b.png" alt="Run B UMAP of risk embeddings.">
-            <figcaption><strong>Run B UMAP.</strong> Strong risk detector, weaker failure-type clustering.</figcaption>
+            <figcaption><strong>Run B UMAP.</strong> Strong detector, weak cluster structure. Good baseline for pure risk ranking.</figcaption>
           </figure>
           <figure class="figure-card">
             <img src="assets/umap_run_c.png" alt="Run C UMAP of risk embeddings.">
-            <figcaption><strong>Run C UMAP.</strong> Better embedding geometry for downstream flow conditioning.</figcaption>
+            <figcaption><strong>Run C UMAP.</strong> More organized z_t geometry, which is why C is selected for flow conditioning.</figcaption>
           </figure>
           <figure class="figure-card">
             <img src="assets/reliability_run_c.png" alt="Run C reliability diagram.">
-            <figcaption><strong>Calibration.</strong> Reliability curves show whether risk scores behave like probabilities.</figcaption>
+            <figcaption><strong>Reliability.</strong> Calibration checks whether predicted risk behaves like a probability.</figcaption>
           </figure>
           <figure class="figure-card">
             <img src="assets/threshold_run_c.png" alt="Run C threshold sweep plot.">
-            <figcaption><strong>Threshold sweep.</strong> Chooses a trigger setting that balances early detection and false alarms.</figcaption>
+            <figcaption><strong>Threshold sweep.</strong> A practical trigger is a tradeoff between early detection and false alarms.</figcaption>
           </figure>
           <figure class="figure-card">
             <img src="assets/flow_c12_metrics.png" alt="Flow C12 training metrics.">
-            <figcaption><strong>Flow metrics.</strong> Stable loss and nonzero residual norms show the model learns a correction field.</figcaption>
+            <figcaption><strong>Flow metrics.</strong> Stable loss and nonzero residual norms show the flow did not collapse.</figcaption>
           </figure>
           <figure class="figure-card">
             <img src="assets/flow_b5_residual_umap.png" alt="Flow B5 residual UMAP.">
-            <figcaption><strong>Residual UMAP.</strong> B5 residuals are visually structured, but closed-loop eval is still required.</figcaption>
+            <figcaption><strong>Residual UMAP.</strong> B5 produces structured residuals, but online shield eval is still the final judge.</figcaption>
+          </figure>
+          <figure class="figure-card">
+            <img src="assets/layer_probe_auc.png" alt="Layer probe AUC.">
+            <figcaption><strong>Layer probes.</strong> Failure signal appears across action-expert layers, motivating layer sweep experiments.</figcaption>
+          </figure>
+          <figure class="figure-card">
+            <img src="assets/heatmap_explained.png" alt="PCA explained variance heatmap.">
+            <figcaption><strong>PCA heatmap.</strong> Shows that low-rank activation bases capture enough variance to justify 48-D residuals.</figcaption>
+          </figure>
+          <figure class="figure-card">
+            <img src="assets/scree_all_layers.png" alt="PCA scree plot across layers.">
+            <figcaption><strong>Scree plots.</strong> Support the choice of PCA-constrained low-rank correction instead of full hidden-state editing.</figcaption>
           </figure>
         </div>
       </section>
@@ -310,30 +497,32 @@
       <section class="section" id="phase3">
         <div class="section-grid two-col">
           <div>
-            <p class="eyebrow">Phase 3 Status</p>
+            <p class="eyebrow">Phase 3 Diagnostic</p>
             <h2>Closed-loop recovery is the final test.</h2>
             <p>
-              The current online shield result is a diagnostic, not the final claim.
-              It shows that false-positive triggering can hurt recovery, especially
-              when the detector fires on otherwise safe steps.
+              The current online shield result used the pre-retrain Run C risk
+              head and layer-11 injection. It is useful because it revealed the
+              real bottleneck: false-positive triggers can over-inject and hurt
+              otherwise recoverable episodes.
             </p>
             <p>
-              The next evaluation uses a nominal-aware retrained risk head, then tests
-              B5/C12/C13 candidates with the same threshold settings.
+              The final plan is to use a nominal-aware risk head, run B5 layer-11
+              smoke, sweep thresholds, then compare B5, C12, and C13 with the
+              same hysteresis setting.
             </p>
           </div>
           <div class="callout">
-            <h3>Main lesson so far</h3>
+            <h3>Current lesson</h3>
             <p>
-              When the shield avoids false-positive injections, perturbed shielded
-              episodes look promising. When it triggers at the wrong time, it can
-              over-correct and lower success.
+              FAPS should not be judged by trigger rate alone. A useful shield
+              must trigger on perturbations while staying quiet on nominal or
+              already-safe recovery states.
             </p>
           </div>
         </div>
 
         <div class="table-wrap">
-          <h3>Pre-Retrain Diagnostic</h3>
+          <h3>Pre-Retrain Online Diagnostic</h3>
           <table>
             <thead>
               <tr>
@@ -385,21 +574,30 @@
 
       <section class="section muted" id="next">
         <div class="section-heading">
-          <p class="eyebrow">Next Steps</p>
-          <h2>What remains before a strong paper claim.</h2>
+          <p class="eyebrow">What We Would Do Next</p>
+          <h2>Turn the diagnostic into final evidence.</h2>
         </div>
         <div class="next-grid">
           <article>
-            <h3>Retrain the trigger</h3>
-            <p>Train the risk head with nominal-success episodes as clean negatives, then rerun calibration and threshold sweep.</p>
+            <h3>1. Fix trigger false alarms</h3>
+            <p>
+              Retrain with nominal success episodes and audit fail_in_H/TTF
+              traces across nominal success, windowed success, failure, and recovery.
+            </p>
           </article>
           <article>
-            <h3>Run Phase 3 ladder</h3>
-            <p>Start with B5 layer-11 smoke, then threshold smoke, then compare B5, C12, and C13 under the same settings.</p>
+            <h3>2. Add B6 flow routing</h3>
+            <p>
+              Combine real risky frames with nearest success/recovered conceptor
+              routing plus failure repulsion, then compare against B5.
+            </p>
           </article>
           <article>
-            <h3>Report closed-loop success</h3>
-            <p>The final headline should be success improvement, recovery rate among triggered episodes, and nominal false-alarm control.</p>
+            <h3>3. Run final shield table</h3>
+            <p>
+              Report unshielded vs FAPS success rate, trigger precision, false
+              alarm, and recovery success across perturbation types.
+            </p>
           </article>
         </div>
       </section>
@@ -407,7 +605,7 @@
       <section class="section resource-section">
         <div class="section-heading">
           <p class="eyebrow">Resources</p>
-          <h2>Project artifacts.</h2>
+          <h2>Artifacts for review.</h2>
         </div>
         <div class="resource-links">
           <a href="poster.pdf">Poster PDF</a>
