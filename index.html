@@ -18,11 +18,11 @@
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
         <a href="#question">Question</a>
+        <a href="#key-figures">Key Figures</a>
         <a href="#method">Method</a>
         <a href="#data">Data</a>
         <a href="#experiments">Experiments</a>
         <a href="#operations">Operations</a>
-        <a href="#results">Results</a>
         <a href="#next">Next</a>
       </nav>
     </header>
@@ -43,7 +43,8 @@
             final action is produced.
           </p>
           <div class="hero-actions" aria-label="Project links">
-            <a class="button primary" href="#experiments">Experiment Design</a>
+            <a class="button primary" href="#key-figures">Key Figures</a>
+            <a class="button secondary" href="#experiments">Experiment Design</a>
             <a class="button secondary" href="poster.pdf">Poster PDF</a>
             <a class="button secondary" href="EXPERIMENT_SUMMARY.md">Run Summary</a>
           </div>
@@ -91,7 +92,68 @@
         </div>
       </section>
 
-      <section class="section muted" id="method">
+      <section class="section muted" id="key-figures">
+        <div class="section-heading">
+          <p class="eyebrow">Key Figures First</p>
+          <h2>The shortest version of the project.</h2>
+          <p>
+            These are the figures a reviewer should see before reading the full
+            experiment log: the architecture, the selected representation, the
+            trigger tradeoff, and the residual-learning evidence.
+          </p>
+        </div>
+
+        <div class="key-figure-layout">
+          <figure class="wide-figure key-architecture">
+            <img src="assets/architecture.png" alt="FAPS architecture diagram showing risk detection and activation injection.">
+            <figcaption>
+              <strong>System overview.</strong> FAPS keeps SmolVLA frozen, reads
+              intermediate action-expert activations, predicts risk, then injects
+              a PCA-constrained residual into one selected layer.
+            </figcaption>
+          </figure>
+
+          <div class="key-figure-stack">
+            <figure class="figure-card">
+              <img src="assets/umap_run_c.png" alt="Run C UMAP of risk embeddings.">
+              <figcaption><strong>Representation.</strong> Run C gives the best z_t geometry for downstream correction.</figcaption>
+            </figure>
+            <figure class="figure-card">
+              <img src="assets/threshold_run_c.png" alt="Run C threshold sweep plot.">
+              <figcaption><strong>Triggering.</strong> Threshold sweep shows the early-detection versus false-alarm tradeoff.</figcaption>
+            </figure>
+            <figure class="figure-card">
+              <img src="assets/flow_c12_metrics.png" alt="Flow C12 training metrics.">
+              <figcaption><strong>Correction.</strong> C12 flow learns nonzero residuals without collapse.</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="evidence-ribbon">
+          <div>
+            <span>Detector</span>
+            <strong>wAUC 0.927</strong>
+            <p>Run B is the strongest pure risk ranking baseline.</p>
+          </div>
+          <div>
+            <span>Encoder</span>
+            <strong>silhouette +0.168</strong>
+            <p>Run C has better failure-type structure for flow conditioning.</p>
+          </div>
+          <div>
+            <span>Residual</span>
+            <strong>delta norm 1.52-2.00</strong>
+            <p>C12/C13/B5 learn substantial activation corrections.</p>
+          </div>
+          <div>
+            <span>Bottleneck</span>
+            <strong>false alarms</strong>
+            <p>Final Phase 3 depends on reducing unnecessary triggers.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="method">
         <div class="section-heading">
           <p class="eyebrow">System Design</p>
           <h2>Three modules around a frozen policy.</h2>
@@ -101,15 +163,6 @@
             states.
           </p>
         </div>
-
-        <figure class="wide-figure">
-          <img src="assets/architecture.png" alt="FAPS architecture diagram showing risk detection and activation injection.">
-          <figcaption>
-            The risk head reads six SmolVLA action-expert layers. The flow model
-            predicts a low-dimensional residual. The injector maps that residual
-            through a layer-specific PCA basis and adds it to the selected hidden state.
-          </figcaption>
-        </figure>
 
         <div class="pipeline">
           <article>

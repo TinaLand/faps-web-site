@@ -250,6 +250,8 @@ h3 {
 .section-grid,
 .section-heading,
 .wide-figure,
+.key-figure-layout,
+.evidence-ribbon,
 .pipeline,
 .detail-grid,
 .figure-pair,
@@ -330,6 +332,67 @@ h3 {
 
 .wide-figure img {
   background: #fff;
+}
+
+.key-figure-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.key-architecture {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.key-architecture img {
+  height: 100%;
+  min-height: 500px;
+  object-fit: contain;
+}
+
+.key-figure-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.key-figure-stack .figure-card img {
+  aspect-ratio: 16 / 9;
+}
+
+.evidence-ribbon {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.evidence-ribbon div {
+  padding: 18px;
+  color: #fff;
+  background: var(--navy);
+  border-radius: 8px;
+}
+
+.evidence-ribbon span {
+  color: #f3b45e;
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.evidence-ribbon strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.18rem;
+}
+
+.evidence-ribbon p {
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.92rem;
 }
 
 figcaption {
@@ -576,6 +639,8 @@ code {
 
   .hero,
   .two-col,
+  .key-figure-layout,
+  .evidence-ribbon,
   .pipeline,
   .detail-grid,
   .figure-pair,
@@ -598,6 +663,10 @@ code {
 
   .hero-panel {
     width: min(640px, 100%);
+  }
+
+  .key-architecture img {
+    min-height: auto;
   }
 
   .section-heading {
