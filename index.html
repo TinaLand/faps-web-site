@@ -17,6 +17,7 @@
         <span>FAPS</span>
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#abstract">Abstract</a>
         <a href="#question">Question</a>
         <a href="#key-figures">Key Figures</a>
         <a href="#method">Method</a>
@@ -29,43 +30,61 @@
 
     <main id="top">
       <section class="hero" aria-labelledby="hero-title">
-        <div class="hero-content">
-          <p class="eyebrow">Stanford CS224R · Spring 2026</p>
-          <h1 id="hero-title">Failure-Aware Policy Shielding</h1>
+        <div class="paper-hero-content">
+          <p class="venue">Stanford CS224R · Spring 2026 · Robotics Final Project</p>
+          <h1 id="hero-title">FAPS: Failure-Aware Policy Shielding for Frozen VLA Policies</h1>
+          <p class="author-line">CS224R Robotics Project Team · Stanford University</p>
           <p class="hero-subtitle">
-            Detecting and correcting risky internal states in frozen
-            vision-language-action policies.
+            Inference-time failure detection and activation-space correction for
+            vision-language-action robot policies.
           </p>
-          <p class="hero-copy">
-            FAPS adds an inference-time safety layer around SmolVLA. It reads
-            intermediate transformer activations, predicts near-term failure,
-            and injects a low-rank residual into the action expert before the
-            final action is produced.
-          </p>
-          <div class="hero-actions" aria-label="Project links">
-            <a class="button primary" href="#key-figures">Key Figures</a>
-            <a class="button secondary" href="#experiments">Experiment Design</a>
-            <a class="button secondary" href="poster.pdf">Poster PDF</a>
-            <a class="button secondary" href="EXPERIMENT_SUMMARY.md">Run Summary</a>
+          <div class="paper-links" aria-label="Project links">
+            <a href="poster.pdf">Poster</a>
+            <a href="FAPS_supplementary.pdf">Supplement</a>
+            <a href="EXPERIMENT_SUMMARY.md">Experiments</a>
+            <a href="COMMANDS_BY_PHASE.md">Commands</a>
+            <a href="https://github.com/equalsdaniel/CS224R_robotics_project">Code</a>
           </div>
+          <figure class="teaser-figure">
+            <img src="assets/architecture.png" alt="FAPS architecture diagram showing risk detection and activation injection.">
+            <figcaption>
+              FAPS keeps SmolVLA frozen, detects risky activations, and injects a
+              PCA-constrained residual into one action-expert layer before the
+              final robot action is produced.
+            </figcaption>
+          </figure>
         </div>
-        <aside class="hero-panel" aria-label="Current project status">
-          <div>
-            <span class="panel-label">Base policy</span>
-            <strong>SmolVLA frozen</strong>
-            <p>No policy fine-tuning; all intervention is inference-time.</p>
-          </div>
-          <div>
-            <span class="panel-label">Risk detector</span>
-            <strong>3.76M params</strong>
-            <p>Multi-layer activations + action + proprio + temporal context.</p>
-          </div>
-          <div>
-            <span class="panel-label">Correction space</span>
-            <strong>48-D residual</strong>
-            <p>PCA-constrained injection into one action-expert layer.</p>
-          </div>
-        </aside>
+      </section>
+
+      <section class="section compact" id="abstract">
+        <div class="abstract-layout">
+          <article class="abstract-card">
+            <p class="eyebrow">Abstract</p>
+            <p>
+              We study whether a frozen vision-language-action policy can be
+              made safer without fine-tuning its weights. FAPS wraps SmolVLA
+              with a learned risk head, a hysteresis trigger, and a flow-matching
+              residual model. The risk head reads intermediate action-expert
+              activations and predicts near-term failure; the residual model
+              generates a low-rank correction that is injected back into a
+              selected hidden layer. Across LIBERO perturbation rollouts, risk
+              is strongly detectable from activations, Run C provides the best
+              downstream representation geometry, and C12/C13 flow runs learn
+              substantial nonzero residuals. Current closed-loop diagnostics
+              show that false-positive triggering, rather than residual learning,
+              is the main bottleneck before final shield evaluation.
+            </p>
+          </article>
+          <aside class="contribution-card">
+            <p class="eyebrow">Contributions</p>
+            <ul class="clean-list">
+              <li>Step-level failure detector over frozen SmolVLA activations.</li>
+              <li>Joint risk, TTF, and contrastive embedding for correction.</li>
+              <li>PCA-constrained flow residuals for hidden-state intervention.</li>
+              <li>Closed-loop diagnostic showing trigger precision is critical.</li>
+            </ul>
+          </aside>
+        </div>
       </section>
 
       <section class="section compact" id="question">
@@ -652,6 +671,26 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
               alarm, and recovery success across perturbation types.
             </p>
           </article>
+        </div>
+      </section>
+
+      <section class="section compact citation-section">
+        <div class="section-grid two-col">
+          <div>
+            <p class="eyebrow">Citation</p>
+            <h2>For course references.</h2>
+            <p>
+              This is a class project page rather than an archival publication.
+              If you reference the project internally, use the repository and
+              poster package linked below.
+            </p>
+          </div>
+          <pre class="bibtex"><code>@misc{faps2026,
+  title  = {FAPS: Failure-Aware Policy Shielding for Frozen VLA Policies},
+  author = {CS224R Robotics Project Team},
+  year   = {2026},
+  note   = {Stanford CS224R final project}
+}</code></pre>
         </div>
       </section>
 
