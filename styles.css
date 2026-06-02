@@ -381,7 +381,7 @@ h3 {
 
 .evidence-ribbon {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 14px;
   margin-top: 18px;
 }
@@ -617,6 +617,32 @@ code {
   overflow: hidden;
 }
 
+.demo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.video-card {
+  overflow: hidden;
+  margin: 0;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(18, 43, 58, 0.06);
+}
+
+.video-card video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #0e2532;
+  object-fit: contain;
+  border-bottom: 1px solid var(--line);
+}
+
 .figure-card img {
   aspect-ratio: 4 / 3;
   object-fit: contain;
@@ -694,6 +720,7 @@ code {
     .ops-grid,
   .ops-notes,
   .figure-grid,
+  .demo-grid,
   .next-grid {
     grid-template-columns: 1fr;
   }

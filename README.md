@@ -39,10 +39,18 @@ http://localhost:8000
 - `index.html`: project website.
 - `styles.css`: styling.
 - `assets/`: figures used by the website.
+- `demo_videos/`: short Phase 3 B6 layer-11 success/failure clips.
 - `poster.pdf`: project poster.
 - `FAPS_supplementary.pdf`: supplementary PDF.
 - `EXPERIMENT_SUMMARY.md`: run summary.
 - `COMMANDS_BY_PHASE.md`: command summary.
 - `GOOGLE_SITES_MIGRATION.md`: notes for manual Google Sites transfer.
+
+Current page status:
+
+- Poster QR code points to `https://github.com/TinaLand?tab=repositories`.
+- The online demo section includes B6 layer-11 success/failure videos.
+- The experiment tables include the latest Phase 3 action-noise task 3/4
+  baseline comparisons and strong/medium all-perturbation demo summaries.
 
 This repo intentionally excludes code, raw data, logs, and model weights.

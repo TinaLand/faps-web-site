@@ -27,9 +27,11 @@ The current evidence supports this story:
 3. **C12/C13 flow runs learn substantial nonzero residuals.** They are viable
    injection-layer candidates, but their final value must be judged by Phase 3
    closed-loop success rate.
-4. **The pre-retrain Phase 3 bottleneck is false-positive triggering.** When the
-   trigger fires at the wrong time, the shield can over-inject and hurt otherwise
-   recoverable episodes.
+4. **Phase 3 B6 layer-11 demos show positive online deltas, with trigger
+   precision as the remaining bottleneck.** On action-noise task demos, FAPS
+   improves task 3 from 30% to 60% and task 4 from 80% to 90%, but the action
+   focus run still triggers on 100% of episodes and has high false-positive
+   rate.
 
 ## Phase 0: Data and Label Diagnostics
 
@@ -78,6 +80,10 @@ Interpretation:
   early detection against false alarms.
 - Run C can use a stricter high threshold and a lower intervention rate, which
   is better for avoiding unnecessary injection.
+- Follow-up retraining with nominal-success hard negatives is now archived:
+  wAUC 0.910, silhouette +0.175, best `delta_high=0.9`, intervention rate
+  0.045, and selected false alarm 0.133. This supports the planned final
+  closed-loop C12/C13 eval, but does not replace it.
 
 Useful assets:
 
@@ -165,8 +171,44 @@ UMAP image.
 
 ## Phase 3: Online Shield Evaluation
 
-Pre-retrain closed-loop shield eval used the Run C risk head and layer-11
-injection. It should be described as a diagnostic run, not the final result.
+### Latest B6 layer-11 conceptor-flow demos
+
+These runs use the retrained Run C risk head and
+`flow_b6_real_full_conceptor_l11`. They should be described as demo-scale
+online evidence, not a final full-suite result.
+
+| Run family | Episodes | Perturbations | Success rate | Trigger rate | Mean FPR | Use |
+|---|---:|---|---:|---:|---:|---|
+| Action-noise focus, tasks 0-4 | 50 | action noise | 0.740 | 1.000 | 0.860 | Main qualitative demo set; shows trigger over-fires. |
+| Strong all-pert, tasks 0-2 | 90 | action noise, image blur, viewpoint | 0.789 | 0.956 | 0.567 | Cleaner high-threshold setting. |
+| Medium all-pert, tasks 0-2 | 90 | action noise, image blur, viewpoint | 0.789 | 1.000 | 0.685 | More sensitive setting; better action-noise coverage. |
+
+Task-level action-noise comparison where unshielded baselines are archived:
+
+| Task | Unshielded SR | FAPS SR | Delta SR | FAPS FPR | Interpretation |
+|---:|---:|---:|---:|---:|---|
+| 3 | 0.30 | 0.60 | +0.30 | 0.911 | Hard task; B6 doubles success but still over-triggers. |
+| 4 | 0.80 | 0.90 | +0.10 | 0.663 | Smaller gain; lower false-positive rate. |
+
+Qualitative demo videos:
+
+- `demo_videos/ep002_SUCCESS.mp4` and `demo_videos/ep004_SUCCESS.mp4` show the
+  shielded arm moving the target object into the plate region.
+- `demo_videos/ep003_FAILURE.mp4` runs to the 30s timeout without placing the
+  object.
+
+Interpretation:
+
+> The flow residual is strong enough to produce online recovery gains, but the
+> gate is too eager. The next high-value experiment is not "train a bigger
+> flow"; it is a threshold/persistence sweep (`delta_high` 0.92-0.97,
+> `k_consec` 5-7) plus a full unshielded all-perturbation baseline.
+
+### Earlier pre-retrain diagnostic
+
+The older closed-loop run used the pre-retrain Run C risk head and layer-11
+injection. Keep it as a diagnostic explaining why the retrained trigger was
+needed.
 
 | Perturbation | Unshielded SR | FAPS SR | Delta SR | Trigger precision | FPR | Interpretation |
 |---|---:|---:|---:|---:|---:|---|
@@ -174,18 +216,6 @@ injection. It should be described as a diagnostic run, not the final result.
 | action noise | 0.70 | 0.80 | +0.10 | 0.183 | 0.896 | Positive delta, but trigger precision is poor. |
 | image blur | 0.80 | 0.80 | 0.00 | 0.165 | 0.936 | No SR gain; many false positives. |
 | joint noise | 0.80 | 0.70 | -0.10 | 0.104 | 0.782 | Hard negative; over-triggering hurts. |
-
-Diagnostic split:
-
-- Perturbed shielded episodes with **zero false-positive injections** succeeded
-  in 17/17 cases.
-- Episodes with at least one false-positive injection succeeded only 46%.
-
-Interpretation:
-
-> The current bottleneck is trigger precision. The immediate next step is to
-> retrain the risk head with nominal successes as clean negatives, then rerun
-> C12/C13 closed-loop shield eval.
 
 ## What Should Be Public
 
@@ -195,6 +225,7 @@ Recommended public package:
 - `FAPS_supplementary.pdf`
 - `EXPERIMENT_SUMMARY.md`
 - `COMMANDS_BY_PHASE.md`
+- `demo_videos/`
 - selected assets under `assets/`
 - fuller grouped visual appendix under `figures_by_experiment/`
 
@@ -215,8 +246,9 @@ Safe claims:
   Run B, despite a small AUC tradeoff.
 - C12/C13 flow runs learn substantial nonzero residuals and are viable
   candidates for injection.
-- Pre-retrain Phase 3 shows the main remaining problem is false-positive
-  triggering.
+- B6 layer-11 conceptor-flow demos show online success-rate gains on action
+  noise tasks 3 and 4.
+- Phase 3 still needs better trigger precision and broader unshielded baselines.
 
 Claims to avoid until final Phase 3:
 

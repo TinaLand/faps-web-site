@@ -21,6 +21,7 @@
         <a href="#question">Question</a>
         <a href="#positioning">Positioning</a>
         <a href="#key-figures">Key Figures</a>
+        <a href="#demos">Demos</a>
         <a href="#method">Method</a>
         <a href="#data">Data</a>
         <a href="#experiments">Experiments</a>
@@ -47,7 +48,7 @@
             <a href="FAPS_supplementary.pdf">Supplement</a>
             <a href="EXPERIMENT_SUMMARY.md">Experiments</a>
             <a href="COMMANDS_BY_PHASE.md">Commands</a>
-            <a href="https://github.com/equalsdaniel/CS224R_robotics_project">Code</a>
+            <a href="https://github.com/TinaLand?tab=repositories">Code</a>
           </div>
           <figure class="teaser-figure">
             <img src="assets/architecture.png" alt="FAPS architecture diagram showing risk detection and activation injection.">
@@ -73,10 +74,10 @@
               unmodified policy when inactive. Across LIBERO perturbation
               rollouts, risk is strongly detectable from activations, Run C
               provides the best downstream representation geometry, and C12/C13
-              flow runs learn substantial nonzero residuals. Current closed-loop
-              diagnostics show that false-positive triggering, rather than
-              residual learning, is the main bottleneck before final shield
-              evaluation.
+              flow runs learn substantial nonzero residuals. The latest B6
+              layer-11 online demos show task-level action-noise gains over
+              unshielded baselines, while also making clear that false-positive
+              triggering is still the main bottleneck.
             </p>
           </article>
           <aside class="contribution-card">
@@ -212,6 +213,103 @@
             <strong>false alarms</strong>
             <p>Final Phase 3 depends on reducing unnecessary triggers.</p>
           </div>
+          <div>
+            <span>Online demo</span>
+            <strong>+30 pts task 3</strong>
+            <p>B6 layer-11 improves action-noise task 3 from 30% to 60%.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="demos">
+        <div class="section-heading">
+          <p class="eyebrow">Online Demo Videos</p>
+          <h2>B6 layer-11 can help, but the trigger is still too eager.</h2>
+          <p>
+            These short clips come from the latest Phase 3 B6 conceptor-flow
+            shield evaluation. The success videos show the arm moving the object
+            toward the target plate; the failure video runs to timeout without
+            successful placement.
+          </p>
+        </div>
+
+        <div class="demo-grid">
+          <figure class="video-card">
+            <video controls preload="metadata" src="demo_videos/ep004_SUCCESS.mp4"></video>
+            <figcaption><strong>Shielded success.</strong> The object reaches the plate region in a short online rollout.</figcaption>
+          </figure>
+          <figure class="video-card">
+            <video controls preload="metadata" src="demo_videos/ep002_SUCCESS.mp4"></video>
+            <figcaption><strong>Second success.</strong> Another B6 layer-11 action-noise recovery clip.</figcaption>
+          </figure>
+          <figure class="video-card">
+            <video controls preload="metadata" src="demo_videos/ep003_FAILURE.mp4"></video>
+            <figcaption><strong>Failure / timeout.</strong> The arm keeps moving but the object is not placed by 30 seconds.</figcaption>
+          </figure>
+        </div>
+
+        <div class="table-wrap">
+          <h3>Latest Phase 3 Online Results</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Evaluation</th>
+                <th>Episodes</th>
+                <th>Baseline SR</th>
+                <th>FAPS SR</th>
+                <th>Delta SR</th>
+                <th>Trigger rate</th>
+                <th>Mean FPR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Action-noise focus, tasks 0-4</td>
+                <td>50</td>
+                <td>--</td>
+                <td>0.74</td>
+                <td>--</td>
+                <td>1.00</td>
+                <td>0.860</td>
+              </tr>
+              <tr class="selected-row">
+                <td>Action noise, task 3</td>
+                <td>10</td>
+                <td>0.30</td>
+                <td>0.60</td>
+                <td>+0.30</td>
+                <td>1.00</td>
+                <td>0.911</td>
+              </tr>
+              <tr class="selected-row">
+                <td>Action noise, task 4</td>
+                <td>10</td>
+                <td>0.80</td>
+                <td>0.90</td>
+                <td>+0.10</td>
+                <td>1.00</td>
+                <td>0.663</td>
+              </tr>
+              <tr>
+                <td>Strong all-pert, tasks 0-2</td>
+                <td>90</td>
+                <td>pending</td>
+                <td>0.789</td>
+                <td>pending</td>
+                <td>0.956</td>
+                <td>0.567</td>
+              </tr>
+              <tr>
+                <td>Medium all-pert, tasks 0-2</td>
+                <td>90</td>
+                <td>pending</td>
+                <td>0.789</td>
+                <td>pending</td>
+                <td>1.00</td>
+                <td>0.685</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
@@ -415,7 +513,7 @@
             <h3>Closed-loop shield eval</h3>
             <p><strong>Question:</strong> Does FAPS improve LIBERO success rate?</p>
             <p><strong>Metrics:</strong> success rate, trigger rate, false alarm, recovery success.</p>
-            <p><strong>Status:</strong> current result is diagnostic; final eval follows retrain.</p>
+            <p><strong>Status:</strong> B6 demos show positive task-level deltas; full baselines and threshold sweeps remain.</p>
           </article>
         </div>
 
@@ -653,15 +751,15 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
             <p class="eyebrow">Phase 3 Diagnostic</p>
             <h2>Closed-loop recovery is the final test.</h2>
             <p>
-              The current online shield result used the pre-retrain Run C risk
-              head and layer-11 injection. It is useful because it revealed the
-              real bottleneck: false-positive triggers can over-inject and hurt
-              otherwise recoverable episodes.
+              The latest online shield result uses the retrained Run C risk head
+              and B6 layer-11 conceptor-flow injection. It shows real task-level
+              recovery gains on action noise, especially task 3, while revealing
+              that the gate still fires too often.
             </p>
             <p>
-              The final plan is to use a nominal-aware risk head, run B5 layer-11
-              smoke, sweep thresholds, then compare B5, C12, and C13 with the
-              same hysteresis setting.
+              The final plan is to complete the all-perturbation unshielded
+              baseline, then sweep stricter thresholds and persistence before
+              scaling to broader C-layer and E-subspace comparisons.
             </p>
           </div>
           <div class="callout">
@@ -675,50 +773,42 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
         </div>
 
         <div class="table-wrap">
-          <h3>Pre-Retrain Online Diagnostic</h3>
+          <h3>Latest B6 Online Diagnostic</h3>
           <table>
             <thead>
               <tr>
-                <th>Perturbation</th>
+                <th>Evaluation</th>
+                <th>N</th>
                 <th>Unshielded SR</th>
                 <th>FAPS SR</th>
                 <th>Delta SR</th>
-                <th>Precision</th>
                 <th>FPR</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>none</td>
-                <td>0.60</td>
-                <td>0.60</td>
-                <td>0.00</td>
+                <td>action focus T0-4</td>
+                <td>50</td>
                 <td>--</td>
+                <td>0.74</td>
                 <td>--</td>
+                <td>0.860</td>
               </tr>
               <tr>
-                <td>action_noise_windowed</td>
-                <td>0.70</td>
+                <td>action task 3</td>
+                <td>10</td>
+                <td>0.30</td>
+                <td>0.60</td>
+                <td>+0.30</td>
+                <td>0.911</td>
+              </tr>
+              <tr>
+                <td>action task 4</td>
+                <td>10</td>
                 <td>0.80</td>
+                <td>0.90</td>
                 <td>+0.10</td>
-                <td>0.183</td>
-                <td>0.896</td>
-              </tr>
-              <tr>
-                <td>image_blur_windowed</td>
-                <td>0.80</td>
-                <td>0.80</td>
-                <td>0.00</td>
-                <td>0.165</td>
-                <td>0.936</td>
-              </tr>
-              <tr>
-                <td>joint_noise_windowed</td>
-                <td>0.80</td>
-                <td>0.70</td>
-                <td>-0.10</td>
-                <td>0.104</td>
-                <td>0.782</td>
+                <td>0.663</td>
               </tr>
             </tbody>
           </table>
@@ -753,8 +843,8 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
           <article>
             <h3>The online bottleneck is calibration.</h3>
             <p>
-              Flow residuals are nonzero and stable; the main failure mode is
-              triggering too often on safe or nominal states.
+              B6 layer-11 improves action-noise task success, but the main
+              remaining failure mode is triggering too often on safe states.
             </p>
           </article>
         </div>
@@ -767,17 +857,17 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
         </div>
         <div class="next-grid">
           <article>
-            <h3>1. Fix trigger false alarms</h3>
+            <h3>1. Reduce trigger false alarms</h3>
             <p>
-              Retrain with nominal success episodes and audit fail_in_H/TTF
-              traces across nominal success, windowed success, failure, and recovery.
+              Sweep higher delta thresholds and longer k-consec persistence
+              after the retrained nominal-aware risk head.
             </p>
           </article>
           <article>
-            <h3>2. Add B6 flow routing</h3>
+            <h3>2. Complete unshielded baselines</h3>
             <p>
-              Combine real risky frames with nearest success/recovered conceptor
-              routing plus failure repulsion, then compare against B5.
+              Run the full all-perturbation baseline so B6 strong/medium demos
+              can be judged against the same task and perturbation mix.
             </p>
           </article>
           <article>
@@ -798,7 +888,7 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
             <h3>5. State limitations clearly</h3>
             <p>
               Current evidence is simulation-only, uses one SmolVLA policy, and
-              still needs final C12/C13 shield evaluation after trigger retrain.
+              still needs broader C-layer/E-subspace evaluation.
             </p>
           </article>
         </div>
@@ -834,7 +924,7 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
           <a href="FAPS_supplementary.pdf">Supplementary PDF</a>
           <a href="EXPERIMENT_SUMMARY.md">Experiment Summary</a>
           <a href="COMMANDS_BY_PHASE.md">Commands by Phase</a>
-          <a href="https://github.com/equalsdaniel/CS224R_robotics_project">GitHub Repository</a>
+          <a href="https://github.com/TinaLand?tab=repositories">GitHub Repositories</a>
         </div>
       </section>
     </main>
