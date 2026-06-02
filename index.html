@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>FAPS | Failure-Aware Policy Shielding</title>
+    <title>SHIELD / FAPS | Failure-Aware Shielding for VLAs</title>
     <meta
       name="description"
-      content="FAPS is a CS224R project on inference-time failure detection, flow-matching correction, and activation-space shielding for frozen VLA policies."
+      content="SHIELD / FAPS is a CS224R project on inference-time failure detection, flow-matching correction, and activation-space shielding for frozen VLA policies."
     >
     <link rel="stylesheet" href="styles.css">
   </head>
@@ -14,7 +14,7 @@
     <header class="site-header">
       <a class="brand" href="#top" aria-label="FAPS home">
         <span class="brand-mark">F</span>
-        <span>FAPS</span>
+        <span>SHIELD / FAPS</span>
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
         <a href="#abstract">Abstract</a>
@@ -34,7 +34,7 @@
       <section class="hero" aria-labelledby="hero-title">
         <div class="paper-hero-content">
           <p class="venue">Stanford CS224R · Spring 2026 · Robotics Final Project</p>
-          <h1 id="hero-title">FAPS: Failure-Aware Policy Shielding for Frozen VLA Policies</h1>
+          <h1 id="hero-title">SHIELD: Failure-Aware Shielding for Frozen VLA Policies</h1>
           <p class="author-line">CS224R Robotics Project Team · Stanford University</p>
           <p class="hero-subtitle">
             Inference-time failure detection and activation-space correction for
@@ -67,17 +67,16 @@
             <p class="eyebrow">Abstract</p>
             <p>
               We study whether a frozen vision-language-action policy can be
-              made safer without fine-tuning its weights. FAPS is a triggered,
+              made safer without fine-tuning its weights. SHIELD / FAPS is a triggered,
               learned, safety-metriced activation-space shield: it fires only
               when calibrated risk crosses a threshold, injects a flow-model
               correction conditioned on failure context, and falls back to the
               unmodified policy when inactive. Across LIBERO perturbation
-              rollouts, risk is strongly detectable from activations, Run C
-              provides the best downstream representation geometry, and C12/C13
-              flow runs learn substantial nonzero residuals. The latest B6
-              layer-11 online demos show task-level action-noise gains over
-              unshielded baselines, while also making clear that false-positive
-              triggering is still the main bottleneck.
+              rollouts, risk is strongly detectable from activations and Run C
+              provides the best downstream representation geometry. The latest
+              post-retrain layer-11 shield improves action-noise success from
+              0.75 to 0.80, while clean, blur, and joint-noise settings show
+              that false-positive triggering is still the main bottleneck.
             </p>
           </article>
           <aside class="contribution-card">
@@ -215,8 +214,8 @@
           </div>
           <div>
             <span>Online demo</span>
-            <strong>+30 pts task 3</strong>
-            <p>B6 layer-11 improves action-noise task 3 from 30% to 60%.</p>
+            <strong>+5 pp action noise</strong>
+            <p>Post-retrain layer-11 shielding improves action noise from 0.75 to 0.80.</p>
           </div>
         </div>
       </section>
@@ -253,60 +252,46 @@
           <table>
             <thead>
               <tr>
-                <th>Evaluation</th>
-                <th>Episodes</th>
-                <th>Baseline SR</th>
-                <th>FAPS SR</th>
+                <th>Perturbation</th>
+                <th>Unshielded SR</th>
+                <th>Shield SR</th>
                 <th>Delta SR</th>
-                <th>Trigger rate</th>
+                <th>Precision</th>
                 <th>Mean FPR</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Action-noise focus, tasks 0-4</td>
-                <td>50</td>
-                <td>--</td>
-                <td>0.74</td>
-                <td>--</td>
-                <td>1.00</td>
-                <td>0.860</td>
-              </tr>
-              <tr class="selected-row">
-                <td>Action noise, task 3</td>
-                <td>10</td>
-                <td>0.30</td>
-                <td>0.60</td>
-                <td>+0.30</td>
-                <td>1.00</td>
-                <td>0.911</td>
-              </tr>
-              <tr class="selected-row">
-                <td>Action noise, task 4</td>
-                <td>10</td>
+                <td>none</td>
                 <td>0.80</td>
-                <td>0.90</td>
-                <td>+0.10</td>
-                <td>1.00</td>
-                <td>0.663</td>
+                <td>0.60</td>
+                <td>-0.20</td>
+                <td>--</td>
+                <td>--</td>
+              </tr>
+              <tr class="selected-row">
+                <td>action noise</td>
+                <td>0.75</td>
+                <td>0.80</td>
+                <td>+0.05</td>
+                <td>0.258</td>
+                <td>0.787</td>
               </tr>
               <tr>
-                <td>Strong all-pert, tasks 0-2</td>
-                <td>90</td>
-                <td>pending</td>
-                <td>0.789</td>
-                <td>pending</td>
-                <td>0.956</td>
-                <td>0.567</td>
+                <td>image blur</td>
+                <td>0.70</td>
+                <td>0.65</td>
+                <td>-0.05</td>
+                <td>0.233</td>
+                <td>0.772</td>
               </tr>
               <tr>
-                <td>Medium all-pert, tasks 0-2</td>
-                <td>90</td>
-                <td>pending</td>
-                <td>0.789</td>
-                <td>pending</td>
-                <td>1.00</td>
-                <td>0.685</td>
+                <td>joint noise</td>
+                <td>0.85</td>
+                <td>0.75</td>
+                <td>-0.10</td>
+                <td>0.320</td>
+                <td>0.752</td>
               </tr>
             </tbody>
           </table>
@@ -513,7 +498,7 @@
             <h3>Closed-loop shield eval</h3>
             <p><strong>Question:</strong> Does FAPS improve LIBERO success rate?</p>
             <p><strong>Metrics:</strong> success rate, trigger rate, false alarm, recovery success.</p>
-            <p><strong>Status:</strong> B6 demos show positive task-level deltas; full baselines and threshold sweeps remain.</p>
+            <p><strong>Status:</strong> Post-retrain layer-11 shielding improves action noise, but false-positive triggering remains the bottleneck.</p>
           </article>
         </div>
 
@@ -752,14 +737,15 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
             <h2>Closed-loop recovery is the final test.</h2>
             <p>
               The latest online shield result uses the retrained Run C risk head
-              and B6 layer-11 conceptor-flow injection. It shows real task-level
-              recovery gains on action noise, especially task 3, while revealing
-              that the gate still fires too often.
+              and B6 layer-11 conceptor-flow injection. It improves action-noise
+              success rate from 0.75 to 0.80 across 20 episodes, but clean,
+              blur, and joint-noise settings show that the gate still fires too
+              often.
             </p>
             <p>
-              The final plan is to complete the all-perturbation unshielded
-              baseline, then sweep stricter thresholds and persistence before
-              scaling to broader C-layer and E-subspace comparisons.
+              The next lever is trigger quality: stricter thresholds,
+              persistence, or cooldowns should reduce false positives before we
+              scale to broader C-layer and E-subspace comparisons.
             </p>
           </div>
           <div class="callout">
@@ -773,42 +759,50 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
         </div>
 
         <div class="table-wrap">
-          <h3>Latest B6 Online Diagnostic</h3>
+          <h3>Post-Retrain Layer-11 Shield Evaluation</h3>
           <table>
             <thead>
               <tr>
-                <th>Evaluation</th>
-                <th>N</th>
+                <th>Perturbation</th>
                 <th>Unshielded SR</th>
-                <th>FAPS SR</th>
+                <th>Shield SR</th>
                 <th>Delta SR</th>
+                <th>Precision</th>
                 <th>FPR</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>action focus T0-4</td>
-                <td>50</td>
-                <td>--</td>
-                <td>0.74</td>
-                <td>--</td>
-                <td>0.860</td>
-              </tr>
-              <tr>
-                <td>action task 3</td>
-                <td>10</td>
-                <td>0.30</td>
-                <td>0.60</td>
-                <td>+0.30</td>
-                <td>0.911</td>
-              </tr>
-              <tr>
-                <td>action task 4</td>
-                <td>10</td>
+                <td>none</td>
                 <td>0.80</td>
-                <td>0.90</td>
-                <td>+0.10</td>
-                <td>0.663</td>
+                <td>0.60</td>
+                <td>-0.20</td>
+                <td>--</td>
+                <td>--</td>
+              </tr>
+              <tr>
+                <td>action noise</td>
+                <td>0.75</td>
+                <td>0.80</td>
+                <td>+0.05</td>
+                <td>0.258</td>
+                <td>0.787</td>
+              </tr>
+              <tr>
+                <td>image blur</td>
+                <td>0.70</td>
+                <td>0.65</td>
+                <td>-0.05</td>
+                <td>0.233</td>
+                <td>0.772</td>
+              </tr>
+              <tr>
+                <td>joint noise</td>
+                <td>0.85</td>
+                <td>0.75</td>
+                <td>-0.10</td>
+                <td>0.320</td>
+                <td>0.752</td>
               </tr>
             </tbody>
           </table>
@@ -864,10 +858,10 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
             </p>
           </article>
           <article>
-            <h3>2. Complete unshielded baselines</h3>
+            <h3>2. Add trigger guardrails</h3>
             <p>
-              Run the full all-perturbation baseline so B6 strong/medium demos
-              can be judged against the same task and perturbation mix.
+              Add cooldowns or stricter persistence so the shield keeps the
+              action-noise gain without over-injecting on clean states.
             </p>
           </article>
           <article>

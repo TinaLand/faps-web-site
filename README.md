@@ -1,6 +1,6 @@
-# FAPS Course Site
+# SHIELD / FAPS Course Site
 
-Standalone static website for the CS224R FAPS project.
+Standalone static website for the CS224R SHIELD / FAPS project.
 
 ## Local Preview
 
@@ -39,7 +39,7 @@ http://localhost:8000
 - `index.html`: project website.
 - `styles.css`: styling.
 - `assets/`: figures used by the website.
-- `demo_videos/`: short Phase 3 B6 layer-11 success/failure clips.
+- `demo_videos/`: short qualitative Phase 3 B6 layer-11 success/failure clips.
 - `poster.pdf`: project poster.
 - `FAPS_supplementary.pdf`: supplementary PDF.
 - `EXPERIMENT_SUMMARY.md`: run summary.
@@ -50,7 +50,8 @@ Current page status:
 
 - Poster QR code points to `https://github.com/TinaLand?tab=repositories`.
 - The online demo section includes B6 layer-11 success/failure videos.
-- The experiment tables include the latest Phase 3 action-noise task 3/4
-  baseline comparisons and strong/medium all-perturbation demo summaries.
+- The experiment tables use the final poster Phase 3 framing: post-retrain
+  layer-11 shielding improves action-noise success from 0.75 to 0.80, while
+  high false-positive rate remains the bottleneck.
 
 This repo intentionally excludes code, raw data, logs, and model weights.
