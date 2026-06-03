@@ -201,8 +201,10 @@ Qualitative demo videos:
 - `demo_videos/pair_ep001_unshielded_fail.mp4` vs.
   `demo_videos/pair_ep001_shielded_success.mp4` shows a second paired rescue
   case.
-- `assets/phase3_video_rescue_comparison.png` is the poster-ready thumbnail
-  summary of these paired rollouts.
+- `assets/phase3_outcome_gallery.png` summarizes all qualitative outcome images
+  with rotated snapshots and explicit shield/recovery/failure labels.
+- `assets/phase3_video_rescue_comparison.png` is the paired-rescue thumbnail
+  summary for the poster and website.
 
 Interpretation:
 

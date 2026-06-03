@@ -49,8 +49,9 @@ http://localhost:8000
 Current page status:
 
 - Poster QR code points to `https://github.com/TinaLand?tab=repositories`.
-- The online demo section includes paired B6 layer-11 rescue videos, shielded
-  success/failure clips, and reference task success/failure clips.
+- The online demo section includes a rotated qualitative outcome gallery, paired
+  B6 layer-11 rescue videos, shielded success/failure clips, and reference task
+  success/failure clips.
 - The experiment tables use the final poster Phase 3 framing: post-retrain
   B6 layer-11 shielding rescues harder action-noise tasks, but easy/high-baseline
   tasks expose the current gating problem. The page frames this as: residual

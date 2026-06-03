@@ -228,11 +228,17 @@
           <h2>B6 layer-11 helps under stress, but the trigger is still too eager.</h2>
           <p>
             These short clips come from the latest Phase 3 B6 conceptor-flow
-            shield evaluation. The success videos show recovery under action
-            noise; the timeout clip shows the remaining failure mode when
-            intervention is poorly timed or insufficient.
+            shield evaluation. The image gallery summarizes every qualitative
+            case: red frames are unshielded or shielded timeouts, while green
+            frames are shielded recoveries where the residual correction helps
+            the policy finish the task.
           </p>
         </div>
+
+        <figure class="wide-figure">
+          <img src="assets/phase3_outcome_gallery.png" alt="Six rotated rollout snapshots labeling unshielded timeouts, shielded recoveries, shielded success, and shielded timeout.">
+          <figcaption><strong>Qualitative outcome map.</strong> Red = no recovery or timeout. Green = shield/recovery success. The important result is not that the shield always wins, but that it can rescue hard action-noise rollouts while still failing when triggering is poorly timed.</figcaption>
+        </figure>
 
         <figure class="wide-figure">
           <img src="assets/phase3_video_rescue_comparison.png" alt="Paired unshielded timeout versus shielded success rollout thumbnails.">
