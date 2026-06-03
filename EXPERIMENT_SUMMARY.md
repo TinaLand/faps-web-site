@@ -214,12 +214,7 @@ Curated qualitative clips and figures:
 | `demo_videos/ep002_SUCCESS.mp4` and `demo_videos/shielded_demo_ep002_success.mp4` | Shielded success example used for visual storytelling. |
 | `demo_videos/ep003_FAILURE.mp4` and `demo_videos/shielded_demo_ep003_failure_timeout.mp4` | Negative shielded example: the intervention does not guarantee recovery. |
 | `demo_videos/ep004_SUCCESS.mp4` and `demo_videos/shielded_demo_ep004_success.mp4` | Additional shielded success example. |
-| `demo_videos/reference_task_success.mp4` | Clean reference task success. |
-| `demo_videos/reference_task_failed_timeout_1.mp4` | Reference failure/timeout case. |
-| `demo_videos/reference_task_failed_timeout_2.mp4` | Second reference failure/timeout case. |
 | `assets/phase3_outcome_gallery.png` | Rotated qualitative outcome gallery with labels for unshielded timeout, shielded recovery, shielded success, and shielded timeout. |
-| `assets/phase3_video_rescue_comparison.png` | Paired-rescue thumbnail summary. |
-| `assets/phase3_task3_rescue_strip.png` | Focused task-3 visual strip, where the current B6 setting has the clearest success-rate gain. |
 
 Clip provenance:
 
@@ -232,9 +227,6 @@ Clip provenance:
 | ep003 shielded | B6 `inject_layer_11`, scale 0.1 | action_noise_windowed | 003 | not preserved in curated mp4 | timeout failure |
 | ep002 shielded | B6 `inject_layer_11`, scale 0.1 | action_noise_windowed | 002 | not preserved in curated mp4 | success |
 | ep004 shielded | B6 `inject_layer_11`, scale 0.1 | action_noise_windowed | 004 | not preserved in curated mp4 | success |
-| reference success | unshielded/reference rollout | mixed/reference | n/a | not preserved in curated mp4 | success |
-| reference failure 1 | unshielded/reference rollout | mixed/reference | n/a | not preserved in curated mp4 | timeout failure |
-| reference failure 2 | unshielded/reference rollout | mixed/reference | n/a | not preserved in curated mp4 | timeout failure |
 
 Task-level success rates come from the archived W&B/CSV logs, not from the
 curated mp4 filenames.

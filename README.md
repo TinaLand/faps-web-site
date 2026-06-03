@@ -28,9 +28,10 @@ activation space alone, using a calibrated trigger and a learned flow residual?
 
 The videos show the qualitative version of the result: matched unshielded
 action-noise rollouts timeout, while B6 layer-11 shielded rollouts can recover
-and complete the task. The same folder also includes shielded successes,
-shielded failures, and reference task clips so the viewer can see both the
-positive cases and the remaining failure modes.
+and complete the task. The public page embeds the paired comparisons first,
+then a small set of shielded successes and a shielded timeout so the viewer can
+see both the positive cases and the remaining failure mode without repeating
+every archived clip.
 
 ### Curated Video Set
 
@@ -45,17 +46,12 @@ All videos are in `demo_videos/`.
 | `ep002_SUCCESS.mp4` / `shielded_demo_ep002_success.mp4` | Shielded success example used for the qualitative gallery. |
 | `ep003_FAILURE.mp4` / `shielded_demo_ep003_failure_timeout.mp4` | Negative shielded example: the trigger fires, but the rollout still times out. |
 | `ep004_SUCCESS.mp4` / `shielded_demo_ep004_success.mp4` | Additional shielded success example. |
-| `reference_task_success.mp4` | Clean reference of successful task execution. |
-| `reference_task_failed_timeout_1.mp4` | Reference timeout/failure case. |
-| `reference_task_failed_timeout_2.mp4` | Second reference timeout/failure case. |
 
 ### Figure Guide
 
 | Figure | Short Explanation |
 |---|---|
-| `assets/phase3_video_rescue_comparison.png` | Side-by-side thumbnail summary: unshielded timeout versus shielded recovery for paired episodes. |
 | `assets/phase3_outcome_gallery.png` | Rotated rollout snapshots labeled by method, perturbation, episode id, and outcome. |
-| `assets/phase3_task3_rescue_strip.png` | Focused task-3 strip showing where SHIELD helps most clearly in the current demo evidence. |
 | `assets/architecture.png` | Full SHIELD pipeline: risk encoder reads VLA activations, calibrated gate decides when to intervene, and flow residual injects a correction. |
 | `assets/layer_probe_auc.png` | Probe result showing that failure information is accessible across SmolVLA action-expert layers. |
 | `assets/reliability_run_c.png` | Calibration diagnostic for the Run C risk head used by the final demo-scale experiments. |
@@ -79,7 +75,7 @@ clearest story for a first-time viewer.
 | `EXPERIMENT_SUMMARY.md` | Run-by-run map: which results are headline, diagnostic, or control |
 | `COMMANDS_BY_PHASE.md` | Phase-by-phase command provenance, design intent, planned next runs |
 | `assets/` | Selected figures used by the poster and supplement |
-| `demo_videos/` | Curated Phase 3 paired rescue, shielded success/failure, and reference clips |
+| `demo_videos/` | Curated Phase 3 paired rescue and shielded success/failure clips |
 | `assets/phase3_outcome_gallery.png` | Rotated qualitative outcome gallery with shield/recovery/failure labels |
 | `figures_by_experiment/` | Full visual appendix grouped by experimental phase |
 

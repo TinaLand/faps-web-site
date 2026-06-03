@@ -930,4 +930,4 @@ Why this design:
 | Phase 1b | Risk scores can be calibrated into trigger thresholds. |
 | Phase 1c | Nominal-success retraining should reduce false-positive triggers. |
 | Phase 2 | Flow matching can learn nontrivial residual corrections, especially for C12/C13. |
-| Phase 3 | The complete FAPS loop improves closed-loop success rate under recoverable perturbations. |
+| Phase 3 | The complete FAPS loop shows selective closed-loop recovery under action noise, with trigger false positives still the main bottleneck. |
