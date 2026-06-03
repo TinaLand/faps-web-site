@@ -205,6 +205,9 @@ Qualitative demo videos:
   with rotated snapshots and explicit shield/recovery/failure labels.
 - `assets/phase3_video_rescue_comparison.png` is the paired-rescue thumbnail
   summary for the poster and website.
+- The website clip table records method, perturbation, episode, result, and
+  the provenance caveat that exact task ids are not preserved in the curated
+  mp4 filenames; task-level numbers come from W&B/CSV logs.
 
 Interpretation:
 

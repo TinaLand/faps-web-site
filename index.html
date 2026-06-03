@@ -245,6 +245,65 @@
           <figcaption><strong>Paired rollout evidence.</strong> Two action-noise cases where the unshielded policy times out but B6 layer-11 shielding completes the task.</figcaption>
         </figure>
 
+        <div class="table-wrap">
+          <h3>How to Read the Qualitative Clips</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Case</th>
+                <th>Method</th>
+                <th>Perturbation</th>
+                <th>Episode</th>
+                <th>Task id</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ep006 unshielded</td>
+                <td>unshielded SmolVLA</td>
+                <td>action_noise_windowed</td>
+                <td>006</td>
+                <td>not preserved in curated mp4</td>
+                <td>timeout / no placement</td>
+              </tr>
+              <tr>
+                <td>ep006 shielded</td>
+                <td>B6 inject_layer_11, scale 0.1</td>
+                <td>action_noise_windowed</td>
+                <td>006</td>
+                <td>not preserved in curated mp4</td>
+                <td>recovery success</td>
+              </tr>
+              <tr>
+                <td>ep001 unshielded</td>
+                <td>unshielded SmolVLA</td>
+                <td>action_noise_windowed</td>
+                <td>001</td>
+                <td>not preserved in curated mp4</td>
+                <td>timeout / no placement</td>
+              </tr>
+              <tr>
+                <td>ep001 shielded</td>
+                <td>B6 inject_layer_11, scale 0.1</td>
+                <td>action_noise_windowed</td>
+                <td>001</td>
+                <td>not preserved in curated mp4</td>
+                <td>recovery success</td>
+              </tr>
+              <tr>
+                <td>ep003 shielded</td>
+                <td>B6 inject_layer_11, scale 0.1</td>
+                <td>action_noise_windowed</td>
+                <td>003</td>
+                <td>not preserved in curated mp4</td>
+                <td>timeout failure</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="note">Task-level success rates are taken from the archived W&amp;B/CSV logs. The curated video filenames preserve episode/outcome labels but not exact task ids.</p>
+        </div>
+
         <h3>Paired Rescue Cases</h3>
         <div class="demo-grid">
           <figure class="video-card">
