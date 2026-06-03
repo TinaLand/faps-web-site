@@ -217,7 +217,7 @@
           <div>
             <span>Online demo</span>
             <strong>+5 pp action noise</strong>
-            <p>Post-retrain layer-11 shielding improves action noise from 0.75 to 0.80.</p>
+            <p>Hard action-noise rollouts show paired rescue: unshielded timeout, shielded success.</p>
           </div>
         </div>
       </section>
@@ -234,18 +234,60 @@
           </p>
         </div>
 
+        <figure class="wide-figure">
+          <img src="assets/phase3_video_rescue_comparison.png" alt="Paired unshielded timeout versus shielded success rollout thumbnails.">
+          <figcaption><strong>Paired rollout evidence.</strong> Two action-noise cases where the unshielded policy times out but B6 layer-11 shielding completes the task.</figcaption>
+        </figure>
+
+        <h3>Paired Rescue Cases</h3>
         <div class="demo-grid">
           <figure class="video-card">
-            <video controls preload="metadata" src="demo_videos/ep004_SUCCESS.mp4"></video>
+            <video controls preload="metadata" src="demo_videos/pair_ep006_unshielded_fail.mp4"></video>
+            <figcaption><strong>ep006 unshielded timeout.</strong> The arm keeps moving for 30 seconds but never completes placement.</figcaption>
+          </figure>
+          <figure class="video-card">
+            <video controls preload="metadata" src="demo_videos/pair_ep006_shielded_success.mp4"></video>
+            <figcaption><strong>ep006 shielded success.</strong> The residual redirects the rollout and completes quickly.</figcaption>
+          </figure>
+          <figure class="video-card">
+            <video controls preload="metadata" src="demo_videos/pair_ep001_unshielded_fail.mp4"></video>
+            <figcaption><strong>ep001 unshielded timeout.</strong> The policy reaches around the objects but does not finish.</figcaption>
+          </figure>
+          <figure class="video-card">
+            <video controls preload="metadata" src="demo_videos/pair_ep001_shielded_success.mp4"></video>
+            <figcaption><strong>ep001 shielded success.</strong> The same scenario family succeeds with the shield active.</figcaption>
+          </figure>
+        </div>
+
+        <h3>Shielded Outcomes</h3>
+        <div class="demo-grid">
+          <figure class="video-card">
+            <video controls preload="metadata" src="demo_videos/shielded_demo_ep004_success.mp4"></video>
             <figcaption><strong>Shielded success.</strong> The object reaches the plate region in a short online rollout.</figcaption>
           </figure>
           <figure class="video-card">
-            <video controls preload="metadata" src="demo_videos/ep002_SUCCESS.mp4"></video>
+            <video controls preload="metadata" src="demo_videos/shielded_demo_ep002_success.mp4"></video>
             <figcaption><strong>Second success.</strong> Another B6 layer-11 action-noise recovery clip.</figcaption>
           </figure>
           <figure class="video-card">
-            <video controls preload="metadata" src="demo_videos/ep003_FAILURE.mp4"></video>
+            <video controls preload="metadata" src="demo_videos/shielded_demo_ep003_failure_timeout.mp4"></video>
             <figcaption><strong>Failure / timeout.</strong> The arm keeps moving but the object is not placed by 30 seconds.</figcaption>
+          </figure>
+        </div>
+
+        <h3>Reference Task Outcomes</h3>
+        <div class="demo-grid">
+          <figure class="video-card">
+            <video controls preload="metadata" src="demo_videos/reference_task_success.mp4"></video>
+            <figcaption><strong>Reference success.</strong> A clean short completion pattern.</figcaption>
+          </figure>
+          <figure class="video-card">
+            <video controls preload="metadata" src="demo_videos/reference_task_failed_timeout_1.mp4"></video>
+            <figcaption><strong>Reference failure.</strong> The arm keeps acting but cannot finish before timeout.</figcaption>
+          </figure>
+          <figure class="video-card">
+            <video controls preload="metadata" src="demo_videos/reference_task_failed_timeout_2.mp4"></video>
+            <figcaption><strong>Second failure mode.</strong> The trajectory drifts instead of completing placement.</figcaption>
           </figure>
         </div>
 
@@ -500,7 +542,7 @@
             <h3>Closed-loop shield eval</h3>
             <p><strong>Question:</strong> Does FAPS improve LIBERO success rate?</p>
             <p><strong>Metrics:</strong> success rate, trigger rate, false alarm, recovery success.</p>
-            <p><strong>Status:</strong> Post-retrain layer-11 shielding improves action noise, but false-positive triggering remains the bottleneck.</p>
+            <p><strong>Status:</strong> B6 layer-11 shielding rescues harder action-noise cases, but false-positive triggering remains the bottleneck.</p>
           </article>
         </div>
 
