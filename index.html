@@ -74,9 +74,11 @@
               unmodified policy when inactive. Across LIBERO perturbation
               rollouts, risk is strongly detectable from activations and Run C
               provides the best downstream representation geometry. The latest
-              post-retrain layer-11 shield improves action-noise success from
-              0.75 to 0.80, while clean, blur, and joint-noise settings show
-              that false-positive triggering is still the main bottleneck.
+              B6 layer-11 shield rescues harder action-noise tasks, improving
+              task 3 from 30% to 60% and task 4 from 80% to 90%. Easier
+              high-baseline tasks show the central limitation: false-positive
+              triggering can make unnecessary correction worse than staying
+              quiet.
             </p>
           </article>
           <aside class="contribution-card">
@@ -223,12 +225,12 @@
       <section class="section" id="demos">
         <div class="section-heading">
           <p class="eyebrow">Online Demo Videos</p>
-          <h2>B6 layer-11 can help, but the trigger is still too eager.</h2>
+          <h2>B6 layer-11 helps under stress, but the trigger is still too eager.</h2>
           <p>
             These short clips come from the latest Phase 3 B6 conceptor-flow
-            shield evaluation. The success videos show the arm moving the object
-            toward the target plate; the failure video runs to timeout without
-            successful placement.
+            shield evaluation. The success videos show recovery under action
+            noise; the timeout clip shows the remaining failure mode when
+            intervention is poorly timed or insufficient.
           </p>
         </div>
 
@@ -737,10 +739,12 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
             <h2>Closed-loop recovery is the final test.</h2>
             <p>
               The latest online shield result uses the retrained Run C risk head
-              and B6 layer-11 conceptor-flow injection. It improves action-noise
-              success rate from 0.75 to 0.80 across 20 episodes, but clean,
-              blur, and joint-noise settings show that the gate still fires too
-              often.
+              and B6 layer-11 conceptor-flow injection. The clearest signal is
+              not universal improvement; it is selective recovery. On harder
+              action-noise tasks, FAPS improves task 3 from 30% to 60% and task
+              4 from 80% to 90%. On easier tasks where the unshielded policy is
+              already strong, extra intervention has little room to help and can
+              hurt.
             </p>
             <p>
               The next lever is trigger quality: stricter thresholds,
@@ -751,9 +755,10 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
           <div class="callout">
             <h3>Current lesson</h3>
             <p>
-              FAPS should not be judged by trigger rate alone. A useful shield
-              must trigger on perturbations while staying quiet on nominal or
-              already-safe recovery states.
+              The residual has recovery signal. The unresolved problem is
+              deciding when to use it. A useful shield must trigger under real
+              policy stress while staying quiet on nominal or already-safe
+              recovery states.
             </p>
           </div>
         </div>
@@ -807,6 +812,65 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
             </tbody>
           </table>
         </div>
+        <div class="table-wrap">
+          <h3>Where the Shield Helps</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Regime</th>
+                <th>Unshielded SR</th>
+                <th>Shield SR</th>
+                <th>Interpretation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Easy/high-baseline tasks 0-2</td>
+                <td>0.811 avg</td>
+                <td>0.789 avg</td>
+                <td>Baseline already succeeds often; intervention can interfere.</td>
+              </tr>
+              <tr class="selected-row">
+                <td>Hard action-noise task 3</td>
+                <td>0.30</td>
+                <td>0.60</td>
+                <td>Strongest rescue signal.</td>
+              </tr>
+              <tr>
+                <td>Action-noise task 4</td>
+                <td>0.80</td>
+                <td>0.90</td>
+                <td>Smaller but positive gain.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="insight-grid">
+          <article>
+            <h3>Phenomenon</h3>
+            <p>
+              FAPS helps most when SmolVLA is genuinely under stress. Hard
+              action-noise tasks show recovery gains, while easy high-baseline
+              tasks leave little room for intervention to help.
+            </p>
+          </article>
+          <article>
+            <h3>Why it matters</h3>
+            <p>
+              The residual can move activations toward recovery, but an eager
+              gate can also perturb a rollout that was already on a successful
+              path. This turns trigger precision into the main system bottleneck.
+            </p>
+          </article>
+          <article>
+            <h3>Next step</h3>
+            <p>
+              Sweep stricter hysteresis thresholds, require more consecutive
+              high-risk steps, add cooldowns, and select the operating point by
+              success rate under a false-positive cap.
+            </p>
+          </article>
+        </div>
       </section>
 
       <section class="section" id="insights">
@@ -837,8 +901,9 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
           <article>
             <h3>The online bottleneck is calibration.</h3>
             <p>
-              B6 layer-11 improves action-noise task success, but the main
-              remaining failure mode is triggering too often on safe states.
+              B6 layer-11 can rescue hard action-noise failures, but the main
+              remaining failure mode is triggering too often on safe or
+              already-recovering states.
             </p>
           </article>
         </div>

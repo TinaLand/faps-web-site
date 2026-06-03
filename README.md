@@ -51,7 +51,9 @@ Current page status:
 - Poster QR code points to `https://github.com/TinaLand?tab=repositories`.
 - The online demo section includes B6 layer-11 success/failure videos.
 - The experiment tables use the final poster Phase 3 framing: post-retrain
-  layer-11 shielding improves action-noise success from 0.75 to 0.80, while
-  high false-positive rate remains the bottleneck.
+  B6 layer-11 shielding rescues harder action-noise tasks, but easy/high-baseline
+  tasks expose the current gating problem. The page frames this as: residual
+  signal exists; intervention timing is the bottleneck; the next step is
+  stricter or learned gating.
 
 This repo intentionally excludes code, raw data, logs, and model weights.

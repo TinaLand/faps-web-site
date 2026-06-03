@@ -27,11 +27,11 @@ The current evidence supports this story:
 3. **C12/C13 flow runs learn substantial nonzero residuals.** They are viable
    injection-layer candidates, but their final value must be judged by Phase 3
    closed-loop success rate.
-4. **Phase 3 B6 layer-11 demos show positive online deltas, with trigger
-   precision as the remaining bottleneck.** On action-noise task demos, FAPS
-   improves task 3 from 30% to 60% and task 4 from 80% to 90%, but the action
-   focus run still triggers on 100% of episodes and has high false-positive
-   rate.
+4. **Phase 3 B6 layer-11 demos show selective online recovery, with trigger
+   precision as the remaining bottleneck.** On harder action-noise tasks, FAPS
+   improves task 3 from 30% to 60% and task 4 from 80% to 90%. On easier
+   high-baseline tasks, the same residual has little room to help and can
+   interfere when the gate over-triggers.
 
 ## Phase 0: Data and Label Diagnostics
 
@@ -200,9 +200,21 @@ Qualitative demo videos:
 Interpretation:
 
 > The flow residual is strong enough to produce online recovery gains, but the
-> gate is too eager. The next high-value experiment is not "train a bigger
-> flow"; it is a threshold/persistence sweep (`delta_high` 0.92-0.97,
-> `k_consec` 5-7) plus a full unshielded all-perturbation baseline.
+> gate is too eager. The method helps most when the base policy is genuinely
+> under stress; on easy/high-baseline tasks, unnecessary correction can erase
+> the benefit. The next high-value experiment is not "train a bigger flow"; it
+> is a threshold/persistence sweep (`delta_high` 0.92-0.97, `k_consec` 5-7)
+> plus a full unshielded all-perturbation baseline.
+
+Phenomenon, impact, and next step:
+
+- **Phenomenon:** FAPS improves hard action-noise cases but does not reliably
+  improve easy/high-baseline cases.
+- **Impact:** Over-triggering can turn a useful residual into a source of
+  interference, causing slowdowns or timeouts on trajectories that might have
+  succeeded unshielded.
+- **Next step:** Tighten the trigger with stricter thresholds, longer
+  persistence, cooldowns, and an FPR-constrained validation sweep.
 
 ### Earlier pre-retrain diagnostic
 
