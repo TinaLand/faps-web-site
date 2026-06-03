@@ -61,9 +61,9 @@
             The clearest current evidence is qualitative and paired: under
             action-noise perturbations, matched unshielded rollouts time out,
             while B6 layer-11 shielded rollouts can recover and complete the
-            task. The same video set also includes shielded successes, shielded
-            failures, and reference task outcomes so the remaining failure modes
-            are visible rather than hidden.
+            task. The page shows the paired comparisons first, then selected
+            shielded successes and one shielded failure so the remaining failure
+            mode is visible without repeating every archived clip.
           </p>
         </div>
 
@@ -88,19 +88,23 @@
         <h3 class="subsection-title">Paired Rescue Cases</h3>
         <div class="comparison-grid">
           <figure class="video-card outcome-fail">
-            <video controls preload="metadata" src="demo_videos/pair_ep006_unshielded_fail.mp4"></video>
+            <video preload="metadata" muted playsinline src="demo_videos/pair_ep006_unshielded_fail.mp4"></video>
+            <button class="video-toggle" type="button">Play / pause</button>
             <figcaption><strong>ep006 unshielded timeout.</strong> Same scenario family without SHIELD: the arm keeps acting but never completes placement.</figcaption>
           </figure>
           <figure class="video-card outcome-success">
-            <video controls preload="metadata" src="demo_videos/pair_ep006_shielded_success.mp4"></video>
+            <video preload="metadata" muted playsinline src="demo_videos/pair_ep006_shielded_success.mp4"></video>
+            <button class="video-toggle" type="button">Play / pause</button>
             <figcaption><strong>ep006 shielded success.</strong> B6 layer-11 residual correction redirects the rollout and finishes the task.</figcaption>
           </figure>
           <figure class="video-card outcome-fail">
-            <video controls preload="metadata" src="demo_videos/pair_ep001_unshielded_fail.mp4"></video>
+            <video preload="metadata" muted playsinline src="demo_videos/pair_ep001_unshielded_fail.mp4"></video>
+            <button class="video-toggle" type="button">Play / pause</button>
             <figcaption><strong>ep001 unshielded timeout.</strong> The policy reaches around the scene but fails to place the object before timeout.</figcaption>
           </figure>
           <figure class="video-card outcome-success">
-            <video controls preload="metadata" src="demo_videos/pair_ep001_shielded_success.mp4"></video>
+            <video preload="metadata" muted playsinline src="demo_videos/pair_ep001_shielded_success.mp4"></video>
+            <button class="video-toggle" type="button">Play / pause</button>
             <figcaption><strong>ep001 shielded success.</strong> With the shield active, the same qualitative setting becomes a recovery success.</figcaption>
           </figure>
         </div>
@@ -116,31 +120,22 @@
           </figure>
         </div>
 
-        <h3 class="subsection-title">Additional Shielded and Reference Outcomes</h3>
+        <h3 class="subsection-title">Additional Shielded Outcomes</h3>
         <div class="demo-grid">
           <figure class="video-card outcome-success">
-            <video controls preload="metadata" src="demo_videos/shielded_demo_ep004_success.mp4"></video>
+            <video preload="metadata" muted playsinline src="demo_videos/shielded_demo_ep004_success.mp4"></video>
+            <button class="video-toggle" type="button">Play / pause</button>
             <figcaption><strong>Shielded success.</strong> The object reaches the plate region in a short online rollout.</figcaption>
           </figure>
           <figure class="video-card outcome-success">
-            <video controls preload="metadata" src="demo_videos/shielded_demo_ep002_success.mp4"></video>
+            <video preload="metadata" muted playsinline src="demo_videos/shielded_demo_ep002_success.mp4"></video>
+            <button class="video-toggle" type="button">Play / pause</button>
             <figcaption><strong>Second shielded success.</strong> Another B6 layer-11 action-noise recovery clip.</figcaption>
           </figure>
           <figure class="video-card outcome-fail">
-            <video controls preload="metadata" src="demo_videos/shielded_demo_ep003_failure_timeout.mp4"></video>
+            <video preload="metadata" muted playsinline src="demo_videos/shielded_demo_ep003_failure_timeout.mp4"></video>
+            <button class="video-toggle" type="button">Play / pause</button>
             <figcaption><strong>Shielded failure / timeout.</strong> The trigger fires, but timing is poor and the rollout still fails.</figcaption>
-          </figure>
-          <figure class="video-card">
-            <video controls preload="metadata" src="demo_videos/reference_task_success.mp4"></video>
-            <figcaption><strong>Reference success.</strong> Clean completion pattern for comparison.</figcaption>
-          </figure>
-          <figure class="video-card outcome-fail">
-            <video controls preload="metadata" src="demo_videos/reference_task_failed_timeout_1.mp4"></video>
-            <figcaption><strong>Reference failure.</strong> Timeout pattern without successful placement.</figcaption>
-          </figure>
-          <figure class="video-card outcome-fail">
-            <video controls preload="metadata" src="demo_videos/reference_task_failed_timeout_2.mp4"></video>
-            <figcaption><strong>Second reference failure.</strong> The trajectory drifts instead of completing placement.</figcaption>
           </figure>
         </div>
 
@@ -291,7 +286,9 @@
           <p>
             The video section shows online behavior. These figures explain why
             the system can detect risk, why Run C was selected for conditioning,
-            and where the current gate still needs work.
+            and where the current gate still needs work. Read them in order:
+            detection signal, representation geometry, calibration, thresholding,
+            residual learning, then residual structure.
           </p>
         </div>
 
@@ -743,57 +740,6 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
         </div>
       </section>
 
-      <section class="section muted" id="results">
-        <div class="section-heading">
-          <p class="eyebrow">Visual Evidence</p>
-          <h2>Different figures answer different claims.</h2>
-          <p>
-            The main mistake to avoid is treating every plot as proof of recovery.
-            Detector plots, calibration plots, flow plots, and closed-loop results
-            support different pieces of the story.
-          </p>
-        </div>
-
-        <div class="figure-grid">
-          <figure class="figure-card">
-            <img src="assets/umap_run_b.png" alt="Run B UMAP of risk embeddings.">
-            <figcaption><strong>Run B UMAP.</strong> Strong detector, weak cluster structure. Good baseline for pure risk ranking.</figcaption>
-          </figure>
-          <figure class="figure-card">
-            <img src="assets/umap_run_c.png" alt="Run C UMAP of risk embeddings.">
-            <figcaption><strong>Run C UMAP.</strong> More organized z_t geometry, which is why C is selected for flow conditioning.</figcaption>
-          </figure>
-          <figure class="figure-card">
-            <img src="assets/reliability_run_c.png" alt="Run C reliability diagram.">
-            <figcaption><strong>Reliability.</strong> Calibration checks whether predicted risk behaves like a probability.</figcaption>
-          </figure>
-          <figure class="figure-card">
-            <img src="assets/threshold_run_c.png" alt="Run C threshold sweep plot.">
-            <figcaption><strong>Threshold sweep.</strong> A practical trigger is a tradeoff between early detection and false alarms.</figcaption>
-          </figure>
-          <figure class="figure-card">
-            <img src="assets/flow_c12_metrics.png" alt="Flow C12 training metrics.">
-            <figcaption><strong>Flow metrics.</strong> Stable loss and nonzero residual norms show the flow did not collapse.</figcaption>
-          </figure>
-          <figure class="figure-card">
-            <img src="assets/flow_b5_residual_umap.png" alt="Flow B5 residual UMAP.">
-            <figcaption><strong>Residual UMAP.</strong> B5 produces structured residuals, but online shield eval is still the final judge.</figcaption>
-          </figure>
-          <figure class="figure-card">
-            <img src="assets/layer_probe_auc.png" alt="Layer probe AUC.">
-            <figcaption><strong>Layer probes.</strong> Failure signal appears across action-expert layers, motivating layer sweep experiments.</figcaption>
-          </figure>
-          <figure class="figure-card">
-            <img src="assets/heatmap_explained.png" alt="PCA explained variance heatmap.">
-            <figcaption><strong>PCA heatmap.</strong> Shows that low-rank activation bases capture enough variance to justify 48-D residuals.</figcaption>
-          </figure>
-          <figure class="figure-card">
-            <img src="assets/scree_all_layers.png" alt="PCA scree plot across layers.">
-            <figcaption><strong>Scree plots.</strong> Support the choice of PCA-constrained low-rank correction instead of full hidden-state editing.</figcaption>
-          </figure>
-        </div>
-      </section>
-
       <section class="section" id="phase3">
         <div class="section-grid two-col">
           <div>
@@ -1054,5 +1000,29 @@ MANIFEST_JOB=$(sbatch --parsable --dependency=afterok:$EXTRACT_JOB docker/prepar
       <p>FAPS: Failure-Aware Policy Shielding · Stanford CS224R · Spring 2026</p>
       <p>Static project page prepared from the current public release assets.</p>
     </footer>
+    <script>
+      document.querySelectorAll('.video-card video').forEach((video) => {
+        video.addEventListener('click', () => {
+          if (video.paused) {
+            video.play();
+          } else {
+            video.pause();
+          }
+        });
+      });
+
+      document.querySelectorAll('.video-toggle').forEach((button) => {
+        button.addEventListener('click', () => {
+          const video = button.closest('.video-card').querySelector('video');
+          if (video.paused) {
+            video.play();
+            button.textContent = 'Pause';
+          } else {
+            video.pause();
+            button.textContent = 'Play';
+          }
+        });
+      });
+    </script>
   </body>
 </html>

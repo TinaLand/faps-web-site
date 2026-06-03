@@ -710,6 +710,27 @@ code {
   background: #0e2532;
   object-fit: contain;
   border-bottom: 1px solid var(--line);
+  transform: rotate(180deg);
+  cursor: pointer;
+}
+
+.video-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 12px 14px 0;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--ink);
+  font: 700 12px/1 var(--font-sans);
+  cursor: pointer;
+}
+
+.video-toggle:hover {
+  border-color: var(--teal);
+  color: var(--teal-dark);
 }
 
 .figure-card img {
