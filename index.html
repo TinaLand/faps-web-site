@@ -17,15 +17,12 @@
         <span>SHIELD / FAPS</span>
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
-        <a href="#demos">Videos</a>
         <a href="#abstract">Abstract</a>
-        <a href="#question">Question</a>
-        <a href="#positioning">Positioning</a>
+        <a href="#demos">Results</a>
         <a href="#key-figures">Figures</a>
         <a href="#method">Method</a>
-        <a href="#data">Data</a>
         <a href="#experiments">Experiments</a>
-        <a href="#operations">Operations</a>
+        <a href="#phase3">Shield Eval</a>
         <a href="#next">Next</a>
       </nav>
     </header>
@@ -53,10 +50,57 @@
         </div>
       </section>
 
+      <section class="section compact overview-section" id="abstract">
+        <div class="abstract-layout">
+          <article class="abstract-card">
+            <p class="eyebrow">Abstract</p>
+            <h2>Inference-time shielding without updating the VLA.</h2>
+            <p>
+              We study whether a frozen vision-language-action policy can be
+              made safer without fine-tuning its weights. SHIELD / FAPS is a
+              triggered, learned, safety-metriced activation-space shield: it
+              fires only when calibrated risk crosses a threshold, injects a
+              flow-model correction conditioned on failure context, and falls
+              back to the unmodified policy when inactive.
+            </p>
+            <p>
+              Across LIBERO perturbation rollouts, risk is strongly detectable
+              from activations and Run C provides the best downstream
+              representation geometry. The latest B6 layer-11 shield rescues
+              harder action-noise tasks, improving task 3 from 30% to 60% and
+              task 4 from 80% to 90%. Easier high-baseline tasks expose the
+              central limitation: false-positive triggering can make
+              unnecessary correction worse than staying quiet.
+            </p>
+          </article>
+          <aside class="contribution-card">
+            <p class="eyebrow">Contributions</p>
+            <ol class="contribution-list">
+              <li>
+                <strong>Risk-triggered shielding.</strong>
+                Calibrated risk gating over frozen SmolVLA activations.
+              </li>
+              <li>
+                <strong>Representation-aware detector.</strong>
+                Joint BCE, TTF, and NT-Xent supervision for risk and geometry.
+              </li>
+              <li>
+                <strong>Learned residual correction.</strong>
+                PCA-constrained flow residual conditioned on risk embedding z_t.
+              </li>
+              <li>
+                <strong>Closed-loop safety metrics.</strong>
+                Success rate plus trigger precision, false alarms, and recovery.
+              </li>
+            </ol>
+          </aside>
+        </div>
+      </section>
+
       <section class="section" id="demos">
         <div class="section-heading">
           <p class="eyebrow">Latest Results & Video Evidence</p>
-          <h2>Start with the paired online rollouts.</h2>
+          <h2>Closed-loop evidence from paired online rollouts.</h2>
           <p>
             The clearest current evidence is qualitative and paired: under
             action-noise perturbations, matched unshielded rollouts time out,
@@ -170,38 +214,6 @@
             </tbody>
           </table>
           <p class="note">Task-level numbers come from archived W&amp;B/CSV logs, not from curated video filenames.</p>
-        </div>
-      </section>
-
-      <section class="section compact" id="abstract">
-        <div class="abstract-layout">
-          <article class="abstract-card">
-            <p class="eyebrow">Abstract</p>
-            <p>
-              We study whether a frozen vision-language-action policy can be
-              made safer without fine-tuning its weights. SHIELD / FAPS is a triggered,
-              learned, safety-metriced activation-space shield: it fires only
-              when calibrated risk crosses a threshold, injects a flow-model
-              correction conditioned on failure context, and falls back to the
-              unmodified policy when inactive. Across LIBERO perturbation
-              rollouts, risk is strongly detectable from activations and Run C
-              provides the best downstream representation geometry. The latest
-              B6 layer-11 shield rescues harder action-noise tasks, improving
-              task 3 from 30% to 60% and task 4 from 80% to 90%. Easier
-              high-baseline tasks show the central limitation: false-positive
-              triggering can make unnecessary correction worse than staying
-              quiet.
-            </p>
-          </article>
-          <aside class="contribution-card">
-            <p class="eyebrow">Contributions</p>
-            <ul class="clean-list">
-              <li>Triggered risk gate over frozen SmolVLA activations.</li>
-              <li>Joint BCE, TTF, and NT-Xent training for risk and geometry.</li>
-              <li>Learned PCA-constrained flow residual conditioned on z_t.</li>
-              <li>Safety metrics beyond success rate: false alarms, trigger precision, recovery.</li>
-            </ul>
-          </aside>
         </div>
       </section>
 
