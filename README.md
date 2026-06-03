@@ -53,10 +53,11 @@ Current page status:
   B6 layer-11 rescue videos, shielded success/failure clips, and reference task
   success/failure clips. The clip table records method, perturbation, episode,
   outcome, and notes that task ids are not preserved in the curated mp4 names.
-- The experiment tables use the final poster Phase 3 framing: post-retrain
-  B6 layer-11 shielding rescues harder action-noise tasks, but easy/high-baseline
-  tasks expose the current gating problem. The page frames this as: residual
-  signal exists; intervention timing is the bottleneck; the next step is
-  stricter or learned gating.
+- The experiment tables and docs use the final poster Phase 3 framing:
+  post-retrain B6 layer-11 shielding rescues harder action-noise tasks, but
+  easy/high-baseline tasks expose the current gating problem. `COMMANDS_BY_PHASE.md`
+  and `EXPERIMENT_SUMMARY.md` are synced to the archived demo-scale evidence:
+  residual signal exists; intervention timing is the bottleneck; the next step
+  is stricter or learned gating.
 
 This repo intentionally excludes code, raw data, logs, and model weights.

@@ -24,9 +24,9 @@ supplement. It is meant to answer three practical questions:
 | Phase 0: data and labels | `docs/data_pipeline.md`, `docs/final_week_farmshare_commands.md` | Planned/recipe commands; collection logs are not all preserved under `runs/`. |
 | Phase 1: risk head | `runs/run_b_bce_ttf_full_s0_20260526_2343/`, `runs/run_c_proposal_default_full_s0_20260527_0732/`, `runs/wandb_archive/phase1_finished/` | B/C exact; A reconstructed from archive; D config-derived. |
 | Phase 1b: calibration and threshold | `runs/run_b_bce_ttf_calibration_sweep_s0_20260527_2332/`, `runs/run_c_proposal_default_calibration_sweep_s0_20260527_2329/`, `docs/training_plans/02_calibration_threshold_plan.md` | Modal commands are from the calibration plan; outputs are archived under `runs/`. |
-| Phase 1c: retrain trigger | `RISK_HEAD_PLAN.md` plus the current W&B `retrain` project decision | Planned. This is the next risk-head run before final Phase 3. |
+| Phase 1c: retrain trigger | W&B `retrain`, `risk_head_full/run_c_retrain_windowed_nominal_30ep_w1_v2/s0/best.pt` | Completed for the current demo-scale Phase 3 evidence. |
 | Phase 2: flow matching | `runs/flow_c4_l12/`, `runs/flow_c5_l13/`, `runs/flow_d_gaussian_l11/`, `runs/flow_z_ownenc_l11/`, `runs/wandb_archive/phase2_finished/` | C12/C13/D/Z exact; older B-family runs mostly archive-derived. |
-| Phase 3: online shield eval | `docs/phase3_command_matrix.md`, `docs/phase3_eval_smoke.md`, Modal logs | Tiny smoke already used as load checks; final commands are planned. |
+| Phase 3: online shield eval | `runs/retain_demo_b6_l11_action_noise_focus_20260602/`, `runs/retain_demo_b6_l11_action_noise_unshielded_tasks3_4_20260602/`, `runs/phase3_video_comparisons_20260603/`, `docs/phase3_command_matrix.md` | Demo-scale B6 action-noise evidence archived; full multi-perturbation eval remains future work. |
 
 ## Phase 0: Data, Labels, Features, Manifest
 
@@ -662,9 +662,31 @@ Phase 3 is the only phase that answers the final robotics question:
 The Phase 3 commands are not just "run everything." They are staged to avoid
 burning expensive Modal time before load checks and threshold checks pass.
 
+### Current Archived Demo Evidence
+
+Status: **Completed at demo scale**. These runs are the current qualitative and
+small-n quantitative Phase 3 evidence, not a full final evaluation table.
+
+| Evidence | Archive | Read |
+|---|---|---|
+| B6 action-noise inject demos, tasks 0-4 | `runs/retain_demo_b6_l11_action_noise_focus_20260602/` | B6 layer-11 residual can rescue hard action-noise cases but over-triggers. |
+| Unshielded action-noise baselines, tasks 3-4 | `runs/retain_demo_b6_l11_action_noise_unshielded_tasks3_4_20260602/` | Gives the paired baseline for the strongest task-level comparison. |
+| Curated paired videos and thumbnails | `runs/phase3_video_comparisons_20260603/`, `public_release/demo_videos/` | Visual story: unshielded timeout versus shielded recovery success, plus failure cases. |
+| Retain W&B demo logs | `runs/wandb_retain_demo_logs_20260602/` | Config/history/summary provenance for finished retain demo runs. |
+
+Key current interpretation:
+
+- Task 3 action-noise success improves from 0.30 unshielded to 0.60 shielded.
+- Task 4 action-noise success improves from 0.80 unshielded to 0.90 shielded.
+- Easy/high-baseline tasks show little room to improve and can be hurt by
+  unnecessary interventions.
+- The next experiment should optimize the gate, not simply increase residual
+  strength: stricter `delta`, longer `k_consec`, cooldowns, and an FPR-constrained
+  validation sweep.
+
 ### Local Code Checks
 
-Status: **Planned**. Source: `docs/phase3_command_matrix.md`.
+Status: **Useful preflight for future runs**. Source: `docs/phase3_command_matrix.md`.
 
 ```bash
 python -m py_compile modal_train_full.py eval/shield_eval.py

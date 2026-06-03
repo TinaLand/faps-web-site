@@ -27,11 +27,10 @@ The current evidence supports this story:
 3. **C12/C13 flow runs learn substantial nonzero residuals.** They are viable
    injection-layer candidates, but their final value must be judged by Phase 3
    closed-loop success rate.
-4. **Phase 3 B6 layer-11 demos show selective online recovery, with trigger
-   precision as the remaining bottleneck.** On harder action-noise tasks, FAPS
-   improves task 3 from 30% to 60% and task 4 from 80% to 90%. On easier
-   high-baseline tasks, the same residual has little room to help and can
-   interfere when the gate over-triggers.
+4. **The pre-retrain Phase 3 bottleneck is false-positive triggering.** When the
+   trigger fires at the wrong time, the shield can over-inject and hurt otherwise
+   recoverable episodes. The follow-up retrained risk head improves the selected
+   trigger operating point, but still needs final C12/C13 online validation.
 
 ## Phase 0: Data and Label Diagnostics
 
@@ -171,68 +170,10 @@ UMAP image.
 
 ## Phase 3: Online Shield Evaluation
 
-### Latest B6 layer-11 conceptor-flow demos
-
-These runs use the retrained Run C risk head and
-`flow_b6_real_full_conceptor_l11`. They should be described as demo-scale
-online evidence, not a final full-suite result.
-
-| Run family | Episodes | Perturbations | Success rate | Trigger rate | Mean FPR | Use |
-|---|---:|---|---:|---:|---:|---|
-| Action-noise focus, tasks 0-4 | 50 | action noise | 0.740 | 1.000 | 0.860 | Main qualitative demo set; shows trigger over-fires. |
-| Strong all-pert, tasks 0-2 | 90 | action noise, image blur, viewpoint | 0.789 | 0.956 | 0.567 | Cleaner high-threshold setting. |
-| Medium all-pert, tasks 0-2 | 90 | action noise, image blur, viewpoint | 0.789 | 1.000 | 0.685 | More sensitive setting; better action-noise coverage. |
-
-Task-level action-noise comparison where unshielded baselines are archived:
-
-| Task | Unshielded SR | FAPS SR | Delta SR | FAPS FPR | Interpretation |
-|---:|---:|---:|---:|---:|---|
-| 3 | 0.30 | 0.60 | +0.30 | 0.911 | Hard task; B6 doubles success but still over-triggers. |
-| 4 | 0.80 | 0.90 | +0.10 | 0.663 | Smaller gain; lower false-positive rate. |
-
-Qualitative demo videos:
-
-- `demo_videos/ep002_SUCCESS.mp4` and `demo_videos/ep004_SUCCESS.mp4` show the
-  shielded arm moving the target object into the plate region.
-- `demo_videos/ep003_FAILURE.mp4` runs to the 30s timeout without placing the
-  object.
-- `demo_videos/pair_ep006_unshielded_fail.mp4` vs.
-  `demo_videos/pair_ep006_shielded_success.mp4` shows a paired rescue case.
-- `demo_videos/pair_ep001_unshielded_fail.mp4` vs.
-  `demo_videos/pair_ep001_shielded_success.mp4` shows a second paired rescue
-  case.
-- `assets/phase3_outcome_gallery.png` summarizes all qualitative outcome images
-  with rotated snapshots and explicit shield/recovery/failure labels.
-- `assets/phase3_video_rescue_comparison.png` is the paired-rescue thumbnail
-  summary for the poster and website.
-- The website clip table records method, perturbation, episode, result, and
-  the provenance caveat that exact task ids are not preserved in the curated
-  mp4 filenames; task-level numbers come from W&B/CSV logs.
-
-Interpretation:
-
-> The flow residual is strong enough to produce online recovery gains, but the
-> gate is too eager. The method helps most when the base policy is genuinely
-> under stress; on easy/high-baseline tasks, unnecessary correction can erase
-> the benefit. The next high-value experiment is not "train a bigger flow"; it
-> is a threshold/persistence sweep (`delta_high` 0.92-0.97, `k_consec` 5-7)
-> plus a full unshielded all-perturbation baseline.
-
-Phenomenon, impact, and next step:
-
-- **Phenomenon:** FAPS improves hard action-noise cases but does not reliably
-  improve easy/high-baseline cases.
-- **Impact:** Over-triggering can turn a useful residual into a source of
-  interference, causing slowdowns or timeouts on trajectories that might have
-  succeeded unshielded.
-- **Next step:** Tighten the trigger with stricter thresholds, longer
-  persistence, cooldowns, and an FPR-constrained validation sweep.
-
-### Earlier pre-retrain diagnostic
-
-The older closed-loop run used the pre-retrain Run C risk head and layer-11
-injection. Keep it as a diagnostic explaining why the retrained trigger was
-needed.
+Closed-loop shield eval should be described as diagnostic evidence, not a
+universal success claim. The latest B6 layer-11 conceptor-flow demos show that
+the learned residual can rescue harder action-noise failures, but that the gate
+still intervenes too often on easy or already-safe rollouts.
 
 | Perturbation | Unshielded SR | FAPS SR | Delta SR | Trigger precision | FPR | Interpretation |
 |---|---:|---:|---:|---:|---:|---|
@@ -240,6 +181,74 @@ needed.
 | action noise | 0.70 | 0.80 | +0.10 | 0.183 | 0.896 | Positive delta, but trigger precision is poor. |
 | image blur | 0.80 | 0.80 | 0.00 | 0.165 | 0.936 | No SR gain; many false positives. |
 | joint noise | 0.80 | 0.70 | -0.10 | 0.104 | 0.782 | Hard negative; over-triggering hurts. |
+
+Diagnostic split:
+
+- Perturbed shielded episodes with **zero false-positive injections** succeeded
+  in 17/17 cases.
+- Episodes with at least one false-positive injection succeeded only 46%.
+
+Interpretation:
+
+> The residual has recovery signal, especially when the base policy is genuinely
+> under stress. The current bottleneck is deciding when to use it. Stricter
+> hysteresis or learned gating should preserve the hard-task gains while reducing
+> false-positive intervention on easy/high-baseline tasks.
+
+Latest B6 action-noise demo comparison:
+
+| Regime | Unshielded SR | FAPS SR | Read |
+|---|---:|---:|---|
+| Easy/high-baseline tasks 0-2 | 0.811 avg | 0.789 avg | Baseline already succeeds often; intervention has little room to help and can hurt. |
+| Hard task 3 | 0.30 | 0.60 | Strongest online rescue signal. |
+| Task 4 | 0.80 | 0.90 | Smaller positive gain; still high false-positive rate. |
+
+Curated qualitative clips:
+
+- `demo_videos/pair_ep006_unshielded_fail.mp4` vs.
+  `demo_videos/pair_ep006_shielded_success.mp4`: paired rescue case.
+- `demo_videos/pair_ep001_unshielded_fail.mp4` vs.
+  `demo_videos/pair_ep001_shielded_success.mp4`: second paired rescue case.
+- `demo_videos/shielded_demo_ep003_failure_timeout.mp4`: useful negative
+  example showing that the shield can still timeout.
+- `assets/phase3_outcome_gallery.png`: rotated qualitative outcome gallery with
+  labels for unshielded timeout, shielded recovery, shielded success, and
+  shielded timeout.
+- `assets/phase3_video_rescue_comparison.png`: paired-rescue thumbnail summary.
+
+Clip provenance:
+
+| Case | Method | Perturbation | Episode | Task id | Result |
+|---|---|---|---:|---|---|
+| ep006 unshielded | unshielded SmolVLA | action_noise_windowed | 006 | not preserved in curated mp4 | timeout / no placement |
+| ep006 shielded | B6 `inject_layer_11`, scale 0.1 | action_noise_windowed | 006 | not preserved in curated mp4 | recovery success |
+| ep001 unshielded | unshielded SmolVLA | action_noise_windowed | 001 | not preserved in curated mp4 | timeout / no placement |
+| ep001 shielded | B6 `inject_layer_11`, scale 0.1 | action_noise_windowed | 001 | not preserved in curated mp4 | recovery success |
+| ep003 shielded | B6 `inject_layer_11`, scale 0.1 | action_noise_windowed | 003 | not preserved in curated mp4 | timeout failure |
+
+Task-level success rates come from the archived W&B/CSV logs, not from the
+curated mp4 filenames.
+
+Supporting archives:
+
+- `runs/wandb_retain_demo_logs_20260602`: W&B config, summary, history, and
+  key log files for all finished retain `demo*` runs.
+- `runs/retain_baseline_action_noise_unshielded_tasks0_4_20260603`: Modal-side
+  CSV/summary outputs for unshielded action-noise baselines on tasks 0-4.
+
+Phenomenon, impact, and next step:
+
+- **Phenomenon:** The shield is selective in where it helps. It improves hard
+  action-noise tasks, but easy/high-baseline tasks do not improve.
+- **Why:** The flow residual appears capable of recovery, but the current gate
+  over-triggers and sometimes applies correction when the nominal policy is
+  already on a successful path.
+- **Impact:** This creates a precision-recall tradeoff at the system level:
+  more triggering increases rescue opportunities, but also increases the chance
+  of disrupting otherwise successful rollouts.
+- **Next step:** Run a threshold/persistence sweep (`delta_high` 0.92-0.97,
+  `k_consec` 5-7), add cooldown or max-recovery limits, and select the operating
+  point using held-out success rate subject to an FPR cap.
 
 ## What Should Be Public
 
@@ -249,7 +258,6 @@ Recommended public package:
 - `FAPS_supplementary.pdf`
 - `EXPERIMENT_SUMMARY.md`
 - `COMMANDS_BY_PHASE.md`
-- `demo_videos/`
 - selected assets under `assets/`
 - fuller grouped visual appendix under `figures_by_experiment/`
 
@@ -270,9 +278,8 @@ Safe claims:
   Run B, despite a small AUC tradeoff.
 - C12/C13 flow runs learn substantial nonzero residuals and are viable
   candidates for injection.
-- B6 layer-11 conceptor-flow demos show online success-rate gains on action
-  noise tasks 3 and 4.
-- Phase 3 still needs better trigger precision and broader unshielded baselines.
+- Pre-retrain Phase 3 shows the main remaining problem is false-positive
+  triggering.
 
 Claims to avoid until final Phase 3:
 
