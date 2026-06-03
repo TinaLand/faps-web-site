@@ -386,6 +386,65 @@ h3 {
   margin-top: 18px;
 }
 
+.highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  max-width: 1180px;
+  margin: 0 auto 28px;
+}
+
+.highlight-card {
+  padding: 20px;
+  color: #fff;
+  background: linear-gradient(135deg, #0b6f75, #122b3a);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.highlight-card.caution {
+  background: linear-gradient(135deg, #a54857, #122b3a);
+}
+
+.highlight-card span {
+  display: block;
+  color: #f3b45e;
+  font-size: 0.72rem;
+  font-weight: 950;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.highlight-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: clamp(1.35rem, 2.6vw, 2.25rem);
+  line-height: 1;
+}
+
+.highlight-card p {
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.subsection-title {
+  max-width: 1180px;
+  margin: 32px auto 16px;
+  color: var(--navy);
+}
+
+.top-spaced {
+  margin-top: 24px;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
 .evidence-ribbon div {
   padding: 18px;
   color: #fff;
@@ -634,6 +693,16 @@ code {
   box-shadow: 0 10px 30px rgba(18, 43, 58, 0.06);
 }
 
+.video-card.outcome-success {
+  border-color: rgba(11, 111, 117, 0.36);
+  box-shadow: 0 12px 32px rgba(11, 111, 117, 0.12);
+}
+
+.video-card.outcome-fail {
+  border-color: rgba(165, 72, 87, 0.36);
+  box-shadow: 0 12px 32px rgba(165, 72, 87, 0.1);
+}
+
 .video-card video {
   display: block;
   width: 100%;
@@ -652,6 +721,10 @@ code {
 
 .callout {
   border-left: 6px solid var(--teal);
+}
+
+.method-architecture {
+  margin-bottom: 22px;
 }
 
 .next-grid {
@@ -720,6 +793,8 @@ code {
     .ops-grid,
   .ops-notes,
   .figure-grid,
+  .highlight-grid,
+  .comparison-grid,
   .demo-grid,
   .next-grid {
     grid-template-columns: 1fr;

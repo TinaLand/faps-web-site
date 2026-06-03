@@ -17,11 +17,11 @@
         <span>SHIELD / FAPS</span>
       </a>
       <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#demos">Videos</a>
         <a href="#abstract">Abstract</a>
         <a href="#question">Question</a>
         <a href="#positioning">Positioning</a>
-        <a href="#key-figures">Key Figures</a>
-        <a href="#demos">Demos</a>
+        <a href="#key-figures">Figures</a>
         <a href="#method">Method</a>
         <a href="#data">Data</a>
         <a href="#experiments">Experiments</a>
@@ -50,14 +50,142 @@
             <a href="COMMANDS_BY_PHASE.md">Commands</a>
             <a href="https://github.com/TinaLand?tab=repositories">Code</a>
           </div>
-          <figure class="teaser-figure">
-            <img src="assets/architecture.png" alt="FAPS architecture diagram showing risk detection and activation injection.">
-            <figcaption>
-              FAPS keeps SmolVLA frozen, detects risky activations, and injects a
-              PCA-constrained residual into one action-expert layer before the
-              final robot action is produced.
-            </figcaption>
+        </div>
+      </section>
+
+      <section class="section" id="demos">
+        <div class="section-heading">
+          <p class="eyebrow">Latest Results & Video Evidence</p>
+          <h2>Start with the paired online rollouts.</h2>
+          <p>
+            The clearest current evidence is qualitative and paired: under
+            action-noise perturbations, matched unshielded rollouts time out,
+            while B6 layer-11 shielded rollouts can recover and complete the
+            task. The same video set also includes shielded successes, shielded
+            failures, and reference task outcomes so the remaining failure modes
+            are visible rather than hidden.
+          </p>
+        </div>
+
+        <div class="highlight-grid">
+          <article class="highlight-card">
+            <span>Hard task 3</span>
+            <strong>0.30 → 0.60</strong>
+            <p>Strongest online rescue signal under action noise.</p>
+          </article>
+          <article class="highlight-card">
+            <span>Task 4</span>
+            <strong>0.80 → 0.90</strong>
+            <p>Smaller positive gain; still limited by false positives.</p>
+          </article>
+          <article class="highlight-card caution">
+            <span>Bottleneck</span>
+            <strong>Trigger precision</strong>
+            <p>Easy/high-baseline tasks can be hurt by over-triggering.</p>
+          </article>
+        </div>
+
+        <h3 class="subsection-title">Paired Rescue Cases</h3>
+        <div class="comparison-grid">
+          <figure class="video-card outcome-fail">
+            <video controls preload="metadata" src="demo_videos/pair_ep006_unshielded_fail.mp4"></video>
+            <figcaption><strong>ep006 unshielded timeout.</strong> Same scenario family without SHIELD: the arm keeps acting but never completes placement.</figcaption>
           </figure>
+          <figure class="video-card outcome-success">
+            <video controls preload="metadata" src="demo_videos/pair_ep006_shielded_success.mp4"></video>
+            <figcaption><strong>ep006 shielded success.</strong> B6 layer-11 residual correction redirects the rollout and finishes the task.</figcaption>
+          </figure>
+          <figure class="video-card outcome-fail">
+            <video controls preload="metadata" src="demo_videos/pair_ep001_unshielded_fail.mp4"></video>
+            <figcaption><strong>ep001 unshielded timeout.</strong> The policy reaches around the scene but fails to place the object before timeout.</figcaption>
+          </figure>
+          <figure class="video-card outcome-success">
+            <video controls preload="metadata" src="demo_videos/pair_ep001_shielded_success.mp4"></video>
+            <figcaption><strong>ep001 shielded success.</strong> With the shield active, the same qualitative setting becomes a recovery success.</figcaption>
+          </figure>
+        </div>
+
+        <div class="figure-pair top-spaced">
+          <figure class="figure-card">
+            <img src="assets/phase3_video_rescue_comparison.png" alt="Paired unshielded timeout versus shielded success rollout thumbnails.">
+            <figcaption><strong>Paired rescue summary.</strong> Two action-noise examples where unshielded rollouts timeout and shielded rollouts succeed.</figcaption>
+          </figure>
+          <figure class="figure-card">
+            <img src="assets/phase3_task3_rescue_strip.png" alt="Task 3 shielded rescue strip.">
+            <figcaption><strong>Task 3 focus.</strong> This strip highlights the clearest online gain: B6 shielding improves hard action-noise Task 3 from 30% to 60% success.</figcaption>
+          </figure>
+        </div>
+
+        <h3 class="subsection-title">Additional Shielded and Reference Outcomes</h3>
+        <div class="demo-grid">
+          <figure class="video-card outcome-success">
+            <video controls preload="metadata" src="demo_videos/shielded_demo_ep004_success.mp4"></video>
+            <figcaption><strong>Shielded success.</strong> The object reaches the plate region in a short online rollout.</figcaption>
+          </figure>
+          <figure class="video-card outcome-success">
+            <video controls preload="metadata" src="demo_videos/shielded_demo_ep002_success.mp4"></video>
+            <figcaption><strong>Second shielded success.</strong> Another B6 layer-11 action-noise recovery clip.</figcaption>
+          </figure>
+          <figure class="video-card outcome-fail">
+            <video controls preload="metadata" src="demo_videos/shielded_demo_ep003_failure_timeout.mp4"></video>
+            <figcaption><strong>Shielded failure / timeout.</strong> The trigger fires, but timing is poor and the rollout still fails.</figcaption>
+          </figure>
+          <figure class="video-card">
+            <video controls preload="metadata" src="demo_videos/reference_task_success.mp4"></video>
+            <figcaption><strong>Reference success.</strong> Clean completion pattern for comparison.</figcaption>
+          </figure>
+          <figure class="video-card outcome-fail">
+            <video controls preload="metadata" src="demo_videos/reference_task_failed_timeout_1.mp4"></video>
+            <figcaption><strong>Reference failure.</strong> Timeout pattern without successful placement.</figcaption>
+          </figure>
+          <figure class="video-card outcome-fail">
+            <video controls preload="metadata" src="demo_videos/reference_task_failed_timeout_2.mp4"></video>
+            <figcaption><strong>Second reference failure.</strong> The trajectory drifts instead of completing placement.</figcaption>
+          </figure>
+        </div>
+
+        <figure class="wide-figure top-spaced">
+          <img src="assets/phase3_outcome_gallery.png" alt="Six rotated rollout snapshots labeling unshielded timeouts, shielded recoveries, shielded success, and shielded timeout.">
+          <figcaption><strong>Qualitative outcome gallery.</strong> Red labels mark timeout/no-recovery cases; green labels mark shielded recovery or success. The figure is intentionally mixed: it shows that SHIELD can rescue hard cases, but not every trigger is helpful.</figcaption>
+        </figure>
+
+        <div class="table-wrap">
+          <h3>Latest Phase 3 Online Results</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Regime</th>
+                <th>Unshielded SR</th>
+                <th>Shield SR</th>
+                <th>Delta SR</th>
+                <th>Read</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Easy/high-baseline tasks 0-2</td>
+                <td>0.811 avg</td>
+                <td>0.789 avg</td>
+                <td>-0.02</td>
+                <td>Baseline already succeeds often; over-triggering can hurt.</td>
+              </tr>
+              <tr class="selected-row">
+                <td>Hard task 3</td>
+                <td>0.30</td>
+                <td>0.60</td>
+                <td>+0.30</td>
+                <td>Strongest online rescue signal.</td>
+              </tr>
+              <tr>
+                <td>Task 4</td>
+                <td>0.80</td>
+                <td>0.90</td>
+                <td>+0.10</td>
+                <td>Smaller gain; still high false-positive rate.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="note">Task-level numbers come from archived W&amp;B/CSV logs, not from curated video filenames.</p>
         </div>
       </section>
 
@@ -158,39 +286,40 @@
 
       <section class="section muted" id="key-figures">
         <div class="section-heading">
-          <p class="eyebrow">Key Figures First</p>
-          <h2>The shortest version of the project.</h2>
+          <p class="eyebrow">Figure Guide</p>
+          <h2>Each figure answers a different claim.</h2>
           <p>
-            These are the figures a reviewer should see before reading the full
-            experiment log: the architecture, the selected representation, the
-            trigger tradeoff, and the residual-learning evidence.
+            The video section shows online behavior. These figures explain why
+            the system can detect risk, why Run C was selected for conditioning,
+            and where the current gate still needs work.
           </p>
         </div>
 
-        <div class="key-figure-layout">
-          <figure class="wide-figure key-architecture">
-            <img src="assets/architecture.png" alt="FAPS architecture diagram showing risk detection and activation injection.">
-            <figcaption>
-              <strong>System overview.</strong> FAPS keeps SmolVLA frozen, reads
-              intermediate action-expert activations, predicts risk, then injects
-              a PCA-constrained residual into one selected layer.
-            </figcaption>
+        <div class="figure-grid">
+          <figure class="figure-card">
+            <img src="assets/layer_probe_auc.png" alt="Layer probe AUC across SmolVLA action-expert layers.">
+            <figcaption><strong>Risk signal.</strong> Failure risk is linearly readable across action-expert layers, so a trigger can fire before visible failure.</figcaption>
           </figure>
-
-          <div class="key-figure-stack">
-            <figure class="figure-card">
-              <img src="assets/umap_run_c.png" alt="Run C UMAP of risk embeddings.">
-              <figcaption><strong>Representation.</strong> Run C gives the best z_t geometry for downstream correction.</figcaption>
-            </figure>
-            <figure class="figure-card">
-              <img src="assets/threshold_run_c.png" alt="Run C threshold sweep plot.">
-              <figcaption><strong>Triggering.</strong> Threshold sweep shows the early-detection versus false-alarm tradeoff.</figcaption>
-            </figure>
-            <figure class="figure-card">
-              <img src="assets/flow_c12_metrics.png" alt="Flow C12 training metrics.">
-              <figcaption><strong>Correction.</strong> C12 flow learns nonzero residuals without collapse.</figcaption>
-            </figure>
-          </div>
+          <figure class="figure-card">
+            <img src="assets/umap_run_c.png" alt="Run C UMAP of risk embeddings.">
+            <figcaption><strong>Representation.</strong> Run C trades a little ranking AUC for better z_t geometry, which is more useful for residual conditioning.</figcaption>
+          </figure>
+          <figure class="figure-card">
+            <img src="assets/reliability_run_c.png" alt="Run C reliability diagram.">
+            <figcaption><strong>Calibration.</strong> Reliability curves check whether risk scores behave like usable trigger probabilities.</figcaption>
+          </figure>
+          <figure class="figure-card">
+            <img src="assets/threshold_run_c.png" alt="Run C threshold sweep plot.">
+            <figcaption><strong>Trigger threshold.</strong> The threshold sweep exposes the central tradeoff: early rescue versus false-positive intervention.</figcaption>
+          </figure>
+          <figure class="figure-card">
+            <img src="assets/flow_c12_metrics.png" alt="Flow C12 training metrics.">
+            <figcaption><strong>Residual learning.</strong> Stable loss and nonzero residual norms show the flow learns corrections rather than collapsing.</figcaption>
+          </figure>
+          <figure class="figure-card">
+            <img src="assets/flow_b5_residual_umap.png" alt="Flow B5 residual UMAP.">
+            <figcaption><strong>Residual structure.</strong> Residual UMAPs are diagnostic: they show structure, but online rollouts are still the final test.</figcaption>
+          </figure>
         </div>
 
         <div class="evidence-ribbon">
@@ -222,191 +351,6 @@
         </div>
       </section>
 
-      <section class="section" id="demos">
-        <div class="section-heading">
-          <p class="eyebrow">Online Demo Videos</p>
-          <h2>B6 layer-11 helps under stress, but the trigger is still too eager.</h2>
-          <p>
-            These short clips come from the latest Phase 3 B6 conceptor-flow
-            shield evaluation. The image gallery summarizes every qualitative
-            case: red frames are unshielded or shielded timeouts, while green
-            frames are shielded recoveries where the residual correction helps
-            the policy finish the task.
-          </p>
-        </div>
-
-        <figure class="wide-figure">
-          <img src="assets/phase3_outcome_gallery.png" alt="Six rotated rollout snapshots labeling unshielded timeouts, shielded recoveries, shielded success, and shielded timeout.">
-          <figcaption><strong>Qualitative outcome map.</strong> Red = no recovery or timeout. Green = shield/recovery success. The important result is not that the shield always wins, but that it can rescue hard action-noise rollouts while still failing when triggering is poorly timed.</figcaption>
-        </figure>
-
-        <figure class="wide-figure">
-          <img src="assets/phase3_video_rescue_comparison.png" alt="Paired unshielded timeout versus shielded success rollout thumbnails.">
-          <figcaption><strong>Paired rollout evidence.</strong> Two action-noise cases where the unshielded policy times out but B6 layer-11 shielding completes the task.</figcaption>
-        </figure>
-
-        <div class="table-wrap">
-          <h3>How to Read the Qualitative Clips</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Case</th>
-                <th>Method</th>
-                <th>Perturbation</th>
-                <th>Episode</th>
-                <th>Task id</th>
-                <th>Result</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>ep006 unshielded</td>
-                <td>unshielded SmolVLA</td>
-                <td>action_noise_windowed</td>
-                <td>006</td>
-                <td>not preserved in curated mp4</td>
-                <td>timeout / no placement</td>
-              </tr>
-              <tr>
-                <td>ep006 shielded</td>
-                <td>B6 inject_layer_11, scale 0.1</td>
-                <td>action_noise_windowed</td>
-                <td>006</td>
-                <td>not preserved in curated mp4</td>
-                <td>recovery success</td>
-              </tr>
-              <tr>
-                <td>ep001 unshielded</td>
-                <td>unshielded SmolVLA</td>
-                <td>action_noise_windowed</td>
-                <td>001</td>
-                <td>not preserved in curated mp4</td>
-                <td>timeout / no placement</td>
-              </tr>
-              <tr>
-                <td>ep001 shielded</td>
-                <td>B6 inject_layer_11, scale 0.1</td>
-                <td>action_noise_windowed</td>
-                <td>001</td>
-                <td>not preserved in curated mp4</td>
-                <td>recovery success</td>
-              </tr>
-              <tr>
-                <td>ep003 shielded</td>
-                <td>B6 inject_layer_11, scale 0.1</td>
-                <td>action_noise_windowed</td>
-                <td>003</td>
-                <td>not preserved in curated mp4</td>
-                <td>timeout failure</td>
-              </tr>
-            </tbody>
-          </table>
-          <p class="note">Task-level success rates are taken from the archived W&amp;B/CSV logs. The curated video filenames preserve episode/outcome labels but not exact task ids.</p>
-        </div>
-
-        <h3>Paired Rescue Cases</h3>
-        <div class="demo-grid">
-          <figure class="video-card">
-            <video controls preload="metadata" src="demo_videos/pair_ep006_unshielded_fail.mp4"></video>
-            <figcaption><strong>ep006 unshielded timeout.</strong> The arm keeps moving for 30 seconds but never completes placement.</figcaption>
-          </figure>
-          <figure class="video-card">
-            <video controls preload="metadata" src="demo_videos/pair_ep006_shielded_success.mp4"></video>
-            <figcaption><strong>ep006 shielded success.</strong> The residual redirects the rollout and completes quickly.</figcaption>
-          </figure>
-          <figure class="video-card">
-            <video controls preload="metadata" src="demo_videos/pair_ep001_unshielded_fail.mp4"></video>
-            <figcaption><strong>ep001 unshielded timeout.</strong> The policy reaches around the objects but does not finish.</figcaption>
-          </figure>
-          <figure class="video-card">
-            <video controls preload="metadata" src="demo_videos/pair_ep001_shielded_success.mp4"></video>
-            <figcaption><strong>ep001 shielded success.</strong> The same scenario family succeeds with the shield active.</figcaption>
-          </figure>
-        </div>
-
-        <h3>Shielded Outcomes</h3>
-        <div class="demo-grid">
-          <figure class="video-card">
-            <video controls preload="metadata" src="demo_videos/shielded_demo_ep004_success.mp4"></video>
-            <figcaption><strong>Shielded success.</strong> The object reaches the plate region in a short online rollout.</figcaption>
-          </figure>
-          <figure class="video-card">
-            <video controls preload="metadata" src="demo_videos/shielded_demo_ep002_success.mp4"></video>
-            <figcaption><strong>Second success.</strong> Another B6 layer-11 action-noise recovery clip.</figcaption>
-          </figure>
-          <figure class="video-card">
-            <video controls preload="metadata" src="demo_videos/shielded_demo_ep003_failure_timeout.mp4"></video>
-            <figcaption><strong>Failure / timeout.</strong> The arm keeps moving but the object is not placed by 30 seconds.</figcaption>
-          </figure>
-        </div>
-
-        <h3>Reference Task Outcomes</h3>
-        <div class="demo-grid">
-          <figure class="video-card">
-            <video controls preload="metadata" src="demo_videos/reference_task_success.mp4"></video>
-            <figcaption><strong>Reference success.</strong> A clean short completion pattern.</figcaption>
-          </figure>
-          <figure class="video-card">
-            <video controls preload="metadata" src="demo_videos/reference_task_failed_timeout_1.mp4"></video>
-            <figcaption><strong>Reference failure.</strong> The arm keeps acting but cannot finish before timeout.</figcaption>
-          </figure>
-          <figure class="video-card">
-            <video controls preload="metadata" src="demo_videos/reference_task_failed_timeout_2.mp4"></video>
-            <figcaption><strong>Second failure mode.</strong> The trajectory drifts instead of completing placement.</figcaption>
-          </figure>
-        </div>
-
-        <div class="table-wrap">
-          <h3>Latest Phase 3 Online Results</h3>
-          <table>
-            <thead>
-              <tr>
-                <th>Perturbation</th>
-                <th>Unshielded SR</th>
-                <th>Shield SR</th>
-                <th>Delta SR</th>
-                <th>Precision</th>
-                <th>Mean FPR</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>none</td>
-                <td>0.80</td>
-                <td>0.60</td>
-                <td>-0.20</td>
-                <td>--</td>
-                <td>--</td>
-              </tr>
-              <tr class="selected-row">
-                <td>action noise</td>
-                <td>0.75</td>
-                <td>0.80</td>
-                <td>+0.05</td>
-                <td>0.258</td>
-                <td>0.787</td>
-              </tr>
-              <tr>
-                <td>image blur</td>
-                <td>0.70</td>
-                <td>0.65</td>
-                <td>-0.05</td>
-                <td>0.233</td>
-                <td>0.772</td>
-              </tr>
-              <tr>
-                <td>joint noise</td>
-                <td>0.85</td>
-                <td>0.75</td>
-                <td>-0.10</td>
-                <td>0.320</td>
-                <td>0.752</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
       <section class="section" id="method">
         <div class="section-heading">
           <p class="eyebrow">System Design</p>
@@ -417,6 +361,17 @@
             states.
           </p>
         </div>
+
+        <figure class="wide-figure method-architecture">
+          <img src="assets/architecture.png" alt="FAPS architecture diagram showing risk detection, gating, and activation injection.">
+          <figcaption>
+            <strong>Architecture.</strong> FAPS reads hidden states from frozen
+            SmolVLA, estimates calibrated risk, opens a hysteresis gate only
+            when risk is high, and injects a learned PCA-constrained residual
+            into a selected action-expert layer. This is the only architecture
+            figure on the page; all earlier visuals focus on observed results.
+          </figcaption>
+        </figure>
 
         <div class="pipeline">
           <article>
